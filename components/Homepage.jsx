@@ -44,6 +44,7 @@ export default function BestTrainerMVP() {
       durata: "12 settimane",
       livello: "Avanzato",
       categoria: "massa",
+      tipo: "Video Corso + PDF",
       immagine: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=400&h=300&fit=crop"
     },
     {
@@ -56,6 +57,7 @@ export default function BestTrainerMVP() {
       durata: "8 settimane",
       livello: "Intermedio",
       categoria: "dimagrimento",
+      tipo: "Ebook + Video",
       immagine: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=300&fit=crop"
     },
     {
@@ -68,6 +70,7 @@ export default function BestTrainerMVP() {
       durata: "16 settimane",
       livello: "Principiante",
       categoria: "forza",
+      tipo: "Video Guida",
       immagine: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=300&fit=crop"
     },
     {
@@ -80,6 +83,7 @@ export default function BestTrainerMVP() {
       durata: "6 settimane", 
       livello: "Tutti i livelli",
       categoria: "cardio",
+      tipo: "Video Corso",
       immagine: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop"
     },
     {
@@ -92,6 +96,7 @@ export default function BestTrainerMVP() {
       durata: "10 settimane",
       livello: "Intermedio", 
       categoria: "forza",
+      tipo: "Ebook PDF",
       immagine: "https://images.unsplash.com/photo-1583500178690-f7e6a7c0ea54?w=400&h=300&fit=crop"
     },
     {
@@ -104,6 +109,7 @@ export default function BestTrainerMVP() {
       durata: "4 settimane",
       livello: "Principiante",
       categoria: "cardio",
+      tipo: "Video Guida",
       immagine: "https://images.unsplash.com/photo-1506629905607-c5b0df6e8863?w=400&h=300&fit=crop"
     }
   ];
@@ -118,13 +124,13 @@ export default function BestTrainerMVP() {
     {
       nome: "Yoga & Stretching", 
       descrizione: "Flessibilità, equilibrio",
-      immagine: "https://images.unsplash.com/photo-1506629905607-c5b0df6e8863?w=300&h=200&fit=crop",
+      immagine: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop",
       programmi: 89
     },
     {
       nome: "Corsa & Cardio",
       descrizione: "Resistenza, dimagrimento", 
-      immagine: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop",
+      immagine: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=200&fit=crop",
       programmi: 74
     },
     {
@@ -142,7 +148,7 @@ export default function BestTrainerMVP() {
     {
       nome: "Arti Marziali",
       descrizione: "Tecniche, combattimento",
-      immagine: "https://images.unsplash.com/photo-1595078475328-1ab05d0a6a0e?w=300&h=200&fit=crop",
+      immagine: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=300&h=200&fit=crop",
       programmi: 37
     },
     {
@@ -196,10 +202,10 @@ export default function BestTrainerMVP() {
                 Accedi
               </Link>
               <Link 
-                href="/auth/pt-application"
+                href="/auth/pt-network"
                 className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors"
               >
-                Diventa PT
+                PT Network
               </Link>
             </div>
           </div>
@@ -222,7 +228,7 @@ export default function BestTrainerMVP() {
           </h1>
           <p className="text-xl lg:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
             <strong>I migliori programmi dai top trainer</strong> per trasformare il tuo fisico. 
-            Programmi personalizzati, certificati e di qualità! 💪
+            Video corsi, ebook e guide personalizzate di qualità! 💪
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-12">
@@ -263,7 +269,7 @@ export default function BestTrainerMVP() {
         </div>
       </section>
 
-      {/* Come Funziona */}
+      {/* Come Funziona - Solo per Utenti */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
@@ -275,15 +281,15 @@ export default function BestTrainerMVP() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-16">
-            {/* Per gli Utenti */}
+          <div className="max-w-2xl mx-auto">
+            {/* Solo sezione Per gli Utenti - centrata */}
             <div className="bg-white rounded-2xl p-8 shadow-lg">
               <div className="text-center mb-8">
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Users className="w-8 h-8 text-blue-600" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Per Te</h3>
-                <p className="text-gray-600">Trova il programma perfetto per i tuoi obiettivi</p>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Trova il Programma Perfetto</h3>
+                <p className="text-gray-600">Video corsi, ebook e guide per raggiungere i tuoi obiettivi</p>
               </div>
 
               <div className="space-y-6">
@@ -310,51 +316,6 @@ export default function BestTrainerMVP() {
                 </div>
               </div>
             </div>
-
-            {/* Per i Personal Trainer */}
-            <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-8 text-white">
-              <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Trophy className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-bold mb-2">Per Personal Trainer</h3>
-                <p className="text-blue-100">Monetizza la tua esperienza e raggiungi più clienti</p>
-              </div>
-
-              <div className="space-y-6">
-                <div className="flex items-start">
-                  <div className="w-8 h-8 bg-white/20 text-white rounded-full flex items-center justify-center font-bold text-sm mr-4 mt-1">1</div>
-                  <div>
-                    <h4 className="font-semibold mb-1">📝 Candidati</h4>
-                    <p className="text-blue-100 text-sm">Invia la tua candidatura con certificazioni e portfolio</p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <div className="w-8 h-8 bg-white/20 text-white rounded-full flex items-center justify-center font-bold text-sm mr-4 mt-1">2</div>
-                  <div>
-                    <h4 className="font-semibold mb-1">💪 Crea Programmi</h4>
-                    <p className="text-blue-100 text-sm">Sviluppa programmi di qualità per la nostra community</p>
-                  </div>
-                </div>
-                <div className="flex items-start">
-                  <div className="w-8 h-8 bg-white/20 text-white rounded-full flex items-center justify-center font-bold text-sm mr-4 mt-1">3</div>
-                  <div>
-                    <h4 className="font-semibold mb-1">🌟 Guadagna e Cresci</h4>
-                    <p className="text-blue-100 text-sm">Monetizza la tua esperienza e costruisci la tua reputazione</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-8">
-                <Link
-                  href="/auth/pt-application"
-                  className="bg-white text-blue-600 hover:bg-gray-100 px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center"
-                >
-                  Diventa Personal Trainer
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Link>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -367,7 +328,7 @@ export default function BestTrainerMVP() {
               La Qualità che <span className="text-blue-400">Meriti</span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              Solo <strong className="text-white">Personal Trainer certificati</strong> e 
+              Programmi ed ebook creati da <strong className="text-white">Personal Trainer certificati</strong> e 
               <strong className="text-white"> preparatori qualificati</strong> con anni di esperienza 
               e risultati comprovati nel settore fitness.
             </p>
@@ -470,7 +431,7 @@ export default function BestTrainerMVP() {
               Trova il Tuo Sport 🏃‍♂️
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Programmi specializzati per ogni disciplina e obiettivo
+              Video corsi, ebook e programmi specializzati per ogni disciplina e obiettivo
             </p>
           </div>
 
@@ -571,6 +532,9 @@ export default function BestTrainerMVP() {
                   </div>
                   <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-sm rounded-lg px-3 py-1">
                     <span className="text-white text-sm font-medium">{programma.livello}</span>
+                  </div>
+                  <div className="absolute top-4 left-4 bg-blue-600/90 backdrop-blur-sm rounded-lg px-2 py-1">
+                    <span className="text-white text-xs font-medium">{programma.tipo}</span>
                   </div>
                 </div>
 
@@ -682,7 +646,7 @@ export default function BestTrainerMVP() {
             <div>
               <h4 className="text-lg font-semibold mb-4">Personal Trainer</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="/auth/pt-application" className="hover:text-white transition-colors">Diventa PT</Link></li>
+                <li><Link href="/auth/pt-network" className="hover:text-white transition-colors">PT Network</Link></li>
                 <li><Link href="/personal-trainer" className="hover:text-white transition-colors">Trova Trainer</Link></li>
                 <li><Link href="/dashboard" className="hover:text-white transition-colors">Dashboard PT</Link></li>
               </ul>
