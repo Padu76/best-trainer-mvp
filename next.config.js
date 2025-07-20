@@ -13,17 +13,9 @@ const nextConfig = {
       'cdn.best-trainer.it'
     ],
     formats: ['image/webp', 'image/avif'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
 
-  // Ottimizzazioni per performance
-  compiler: {
-    // Rimuove console.log in produzione
-    removeConsole: process.env.NODE_ENV === 'production',
-  },
-
-  // Configurazione per PWA (Progressive Web App)
+  // Headers di sicurezza
   async headers() {
     return [
       {
@@ -40,15 +32,6 @@ const nextConfig = {
           {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
-          },
-        ],
-      },
-      {
-        source: '/sw.js',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=0, must-revalidate',
           },
         ],
       },
@@ -71,43 +54,14 @@ const nextConfig = {
     ]
   },
 
-  // Rewrites per API e routing
-  async rewrites() {
-    return [
-      {
-        source: '/api/airtable/:path*',
-        destination: 'https://api.airtable.com/:path*',
-      },
-    ]
-  },
-
-  // Configurazione per export statico (se necessario)
+  // Configurazione per export statico
   trailingSlash: false,
   
-  // Ottimizzazioni bundle
-  experimental: {
-    optimizeCss: true,
-    legacyBrowsers: false,
-  },
-
-  // Configurazione webpack personalizzata
-  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
-    // Ottimizzazioni per bundle size
-    if (!dev && !isServer) {
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        '@sentry/node': '@sentry/browser',
-      }
-    }
-
-    return config
-  },
-
   // Variabili ambiente pubbliche
   env: {
     SITE_NAME: 'Best-Trainer',
     SITE_URL: process.env.NODE_ENV === 'production' 
-      ? 'https://best-trainer.vercel.app' 
+      ? 'https://best-trainer-mvp.vercel.app' 
       : 'http://localhost:3000',
   },
 }
