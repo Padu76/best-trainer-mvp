@@ -217,12 +217,12 @@ export default function BestTrainerMVP() {
         
         <div className="relative max-w-7xl mx-auto px-6 text-center">
           <h1 className="text-5xl lg:text-7xl font-bold mb-6">
-            Il <span className="text-blue-300">Marketplace</span><br />
-            dei Personal Trainer
+            La <span className="text-blue-300">Piattaforma</span><br />
+            dei Programmi Fitness
           </h1>
           <p className="text-xl lg:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
-            Trova programmi di allenamento personalizzati creati da <strong>Personal Trainer certificati</strong>. 
-            La tua trasformazione inizia qui! 💪
+            <strong>I migliori programmi dai top trainer</strong> per trasformare il tuo fisico. 
+            Programmi personalizzati, certificati e di qualità! 💪
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4 mb-12">
@@ -660,7 +660,7 @@ export default function BestTrainerMVP() {
             <div>
               <h3 className="text-2xl font-bold mb-4">Best-Trainer</h3>
               <p className="text-gray-400 mb-4">
-                Il marketplace italiano dei Personal Trainer. Trasforma la tua passione per il fitness in risultati concreti.
+                La piattaforma dei programmi fitness. Trasforma la tua passione per il fitness in risultati concreti.
               </p>
               <div className="flex space-x-4">
                 <Facebook className="w-5 h-5 text-gray-400 hover:text-blue-400 cursor-pointer transition-colors" />
