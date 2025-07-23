@@ -29,11 +29,20 @@ import {
   FileText,
   Image as ImageIcon,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Bot,
+  Sparkles,
+  Wand2,
+  Copy,
+  RefreshCw,
+  Zap
 } from 'lucide-react';
 
 export default function PTDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedContent, setGeneratedContent] = useState('');
+  
   const [profileData, setProfileData] = useState({
     nome: 'Marco Rossi',
     cognome: '',
@@ -94,6 +103,8 @@ export default function PTDashboard() {
   });
 
   const [showNewProgramForm, setShowNewProgramForm] = useState(false);
+  const [aiContentType, setAiContentType] = useState('');
+  const [showAiModal, setShowAiModal] = useState(false);
 
   const categorie = [
     'Massa Muscolare', 'Dimagrimento', 'Forza & Potenza', 'Cardio & Resistenza',
@@ -107,6 +118,132 @@ export default function PTDashboard() {
     'Dimagrimento', 'Tonificazione', 'Yoga', 'Pilates', 'Cardio',
     'Preparazione Atletica', 'Riabilitazione', 'Posturale'
   ];
+
+  // Simulazione chiamata AI API
+  const generateAIContent = async (type, context = {}) => {
+    setIsGenerating(true);
+    
+    // Simula chiamata API (in produzione sarà una chiamata reale)
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    let content = '';
+    
+    switch(type) {
+      case 'program-description':
+        content = `🔥 TRASFORMA IL TUO FISICO IN ${context.durata || '12 SETTIMANE'}!
+
+Questo programma ${context.categoria?.toLowerCase() || 'di allenamento'} è stato scientificamente progettato per massimizzare i tuoi risultati in tempi record.
+
+✅ COSA OTTERRAI:
+• Aumento significativo della massa muscolare magra
+• Miglioramento della forza e resistenza
+• Definizione muscolare visibile già dalle prime settimane
+• Piano nutrizionale incluso per ottimizzare i risultati
+
+🎯 PERFETTO PER:
+• Livello ${context.livello?.toLowerCase() || 'intermedio'}
+• Chi vuole risultati concreti e duraturi
+• Chi cerca un approccio professionale e strutturato
+
+💪 INCLUDE:
+• ${context.durata || '12 settimane'} di programmazione dettagliata
+• Video tutorial per ogni esercizio
+• Schede di allenamento scaricabili
+• Supporto WhatsApp diretto
+• Piano nutrizionale personalizzabile
+
+⚡ GARANZIA: Se non sei soddisfatto al 100%, rimborso completo entro 30 giorni!
+
+Non aspettare ancora. La tua trasformazione inizia ORA! 🚀`;
+        break;
+        
+      case 'bio-professional':
+        content = `🏆 Personal Trainer Certificato con ${profileData.anniEsperienza} anni di esperienza nel settore fitness
+
+Specializzato in ${profileData.specializzazioni.join(', ').toLowerCase()}, ho aiutato centinaia di persone a raggiungere i loro obiettivi di trasformazione fisica e benessere.
+
+✅ CERTIFICAZIONI: ${profileData.certificazioni.join(' • ')}
+💪 ESPERIENZA: ${profileData.anniEsperienza}+ anni di coaching personalizzato
+🎯 SPECIALIZZAZIONI: ${profileData.specializzazioni.join(' • ')}
+📍 LOCATION: ${profileData.citta}
+
+La mia filosofia è semplice: ogni persona è unica e merita un approccio personalizzato. Non esistono programmi standard, ma solo soluzioni su misura per te.
+
+🚀 I MIEI RISULTATI PARLANO CHIARO:
+• 500+ clienti trasformati
+• 95% di successo negli obiettivi
+• Metodologie scientificamente provate
+• Supporto continuo e motivazione costante
+
+Pronto a iniziare la tua trasformazione? Contattami e scopriamo insieme come raggiungere i tuoi obiettivi! 💪
+
+${profileData.instagram ? `📸 ${profileData.instagram}` : ''}
+${profileData.sitoWeb ? `🌐 ${profileData.sitoWeb}` : ''}`;
+        break;
+        
+      case 'program-titles':
+        const titles = [
+          `${context.categoria} ESTREMO: Risultati in ${context.durata}`,
+          `TRASFORMAZIONE ${context.categoria?.toUpperCase()}: Il Metodo Che Funziona`,
+          `${context.categoria} REVOLUTION: Da Zero a Eroe`,
+          `PROJECT ${context.categoria?.toUpperCase()}: Il Tuo Nuovo Fisico`,
+          `${context.categoria} INTENSIVE: Massimi Risultati, Minimo Tempo`
+        ];
+        content = titles.join('\n');
+        break;
+        
+      case 'social-post':
+        content = `🔥 NUOVO PROGRAMMA DISPONIBILE! 🔥
+
+${context.titolo || 'Il programma che cambierà il tuo fisico'}
+
+💪 Stanco di allenarti senza vedere risultati?
+⏰ Hai solo ${context.durata || '12 settimane'} per trasformarti?
+🎯 Vuoi un metodo che FUNZIONA davvero?
+
+✅ Questo programma ${context.categoria?.toLowerCase() || 'di allenamento'} ti darà:
+• Risultati visibili già dalla 2a settimana
+• Aumento della forza del 25%+ 
+• Definizione muscolare da urlo
+• Supporto personalizzato H24
+
+⚡ OFFERTA LANCIO: €${context.prezzo || '79.99'} invece di €99.99
+(Solo per i primi 50 clienti!)
+
+👆 Link in bio per acquistare
+💬 DM per info personalizzate
+
+#fitness #transformation #${context.categoria?.toLowerCase().replace(' ', '')} #personaltrainer #results #workout #motivation #fitnessmotivation #transformation #strong #muscle #gymlife`;
+        break;
+        
+      default:
+        content = 'Contenuto generato dall\'AI...';
+    }
+    
+    setGeneratedContent(content);
+    setIsGenerating(false);
+  };
+
+  const handleAIGenerate = (type, context = {}) => {
+    setAiContentType(type);
+    setShowAiModal(true);
+    generateAIContent(type, context);
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    alert('Contenuto copiato negli appunti!');
+  };
+
+  const applyGeneratedContent = () => {
+    if (aiContentType === 'program-description' && showNewProgramForm) {
+      setNuovoProgramma(prev => ({ ...prev, descrizione: generatedContent }));
+    } else if (aiContentType === 'bio-professional') {
+      setProfileData(prev => ({ ...prev, bio: generatedContent }));
+    }
+    setShowAiModal(false);
+    alert('Contenuto applicato con successo!');
+  };
 
   const handleProfileUpdate = (field, value) => {
     setProfileData(prev => ({
@@ -128,7 +265,6 @@ export default function PTDashboard() {
     if (type === 'profile') {
       setProfileData(prev => ({ ...prev, fotoProfile: file }));
     }
-    // Per ora simuliamo l'upload
     console.log(`Upload ${type}:`, file);
   };
 
@@ -174,6 +310,7 @@ export default function PTDashboard() {
 
   const tabs = [
     { id: 'overview', label: 'Dashboard', icon: TrendingUp },
+    { id: 'ai-assistant', label: 'AI Assistant', icon: Bot },
     { id: 'profile', label: 'Profilo', icon: User },
     { id: 'programs', label: 'Programmi', icon: FileText },
     { id: 'settings', label: 'Impostazioni', icon: Settings }
@@ -245,6 +382,9 @@ export default function PTDashboard() {
                     >
                       <Icon className="w-5 h-5 mr-3" />
                       {tab.label}
+                      {tab.id === 'ai-assistant' && (
+                        <Sparkles className="w-4 h-4 ml-auto text-yellow-400" />
+                      )}
                     </button>
                   );
                 })}
@@ -303,6 +443,23 @@ export default function PTDashboard() {
                     </div>
                   </div>
 
+                  {/* AI Quick Actions */}
+                  <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-6 mb-8">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold text-white mb-2">🤖 AI Assistant</h3>
+                        <p className="text-purple-100">Lascia che l'AI ottimizzi i tuoi contenuti</p>
+                      </div>
+                      <button
+                        onClick={() => setActiveTab('ai-assistant')}
+                        className="bg-white text-purple-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors flex items-center"
+                      >
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Usa AI
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Recent Programs */}
                   <div className="bg-white rounded-xl shadow-sm p-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Programmi Recenti</h3>
@@ -331,15 +488,182 @@ export default function PTDashboard() {
               </div>
             )}
 
+            {/* AI Assistant Tab */}
+            {activeTab === 'ai-assistant' && (
+              <div className="space-y-8">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-gray-900 flex items-center">
+                    <Bot className="w-8 h-8 mr-3 text-blue-600" />
+                    AI Content Assistant
+                  </h2>
+                  <div className="flex items-center text-sm text-gray-500">
+                    <Zap className="w-4 h-4 mr-1" />
+                    Powered by AI
+                  </div>
+                </div>
+
+                {/* AI Tools Grid */}
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Program Description Generator */}
+                  <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="flex items-center mb-4">
+                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                        <FileText className="w-6 h-6 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">Descrizioni Programmi</h3>
+                        <p className="text-sm text-gray-600">Genera descrizioni accattivanti</p>
+                      </div>
+                    </div>
+                    <p className="text-gray-600 mb-4">
+                      Crea descrizioni professionali che convertono visitatori in clienti
+                    </p>
+                    <button
+                      onClick={() => handleAIGenerate('program-description', {
+                        categoria: 'Massa Muscolare',
+                        livello: 'Avanzato',
+                        durata: '12 settimane'
+                      })}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-colors flex items-center justify-center"
+                    >
+                      <Wand2 className="w-4 h-4 mr-2" />
+                      Genera Descrizione
+                    </button>
+                  </div>
+
+                  {/* Bio Professional Generator */}
+                  <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="flex items-center mb-4">
+                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                        <User className="w-6 h-6 text-green-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">Bio Professionale</h3>
+                        <p className="text-sm text-gray-600">Ottimizza il tuo profilo</p>
+                      </div>
+                    </div>
+                    <p className="text-gray-600 mb-4">
+                      Bio professionale che trasmette autorevolezza e competenza
+                    </p>
+                    <button
+                      onClick={() => handleAIGenerate('bio-professional')}
+                      className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg transition-colors flex items-center justify-center"
+                    >
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Ottimizza Bio
+                    </button>
+                  </div>
+
+                  {/* Title Generator */}
+                  <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="flex items-center mb-4">
+                      <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
+                        <Target className="w-6 h-6 text-purple-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">Titoli Accattivanti</h3>
+                        <p className="text-sm text-gray-600">Titoli che vendono</p>
+                      </div>
+                    </div>
+                    <p className="text-gray-600 mb-4">
+                      Genera titoli irresistibili per i tuoi programmi
+                    </p>
+                    <button
+                      onClick={() => handleAIGenerate('program-titles', {
+                        categoria: 'Massa Muscolare',
+                        durata: '12 settimane'
+                      })}
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-lg transition-colors flex items-center justify-center"
+                    >
+                      <Zap className="w-4 h-4 mr-2" />
+                      Genera Titoli
+                    </button>
+                  </div>
+
+                  {/* Social Media Posts */}
+                  <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="flex items-center mb-4">
+                      <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mr-4">
+                        <Instagram className="w-6 h-6 text-pink-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">Post Social</h3>
+                        <p className="text-sm text-gray-600">Content per Instagram</p>
+                      </div>
+                    </div>
+                    <p className="text-gray-600 mb-4">
+                      Post Instagram pronti per promuovere i tuoi programmi
+                    </p>
+                    <button
+                      onClick={() => handleAIGenerate('social-post', {
+                        titolo: 'Massa Muscolare Avanzato',
+                        categoria: 'Massa Muscolare',
+                        durata: '12 settimane',
+                        prezzo: '79.99'
+                      })}
+                      className="w-full bg-pink-600 hover:bg-pink-700 text-white px-4 py-3 rounded-lg transition-colors flex items-center justify-center"
+                    >
+                      <Instagram className="w-4 h-4 mr-2" />
+                      Crea Post
+                    </button>
+                  </div>
+                </div>
+
+                {/* AI Tips */}
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">💡 Consigli AI</h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="flex items-start">
+                      <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-gray-900">Personalizza sempre</p>
+                        <p className="text-sm text-gray-600">Modifica i contenuti AI per riflettere il tuo stile</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-gray-900">Testa e ottimizza</p>
+                        <p className="text-sm text-gray-600">Prova versioni diverse per vedere cosa funziona meglio</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-gray-900">Mantieni autenticità</p>
+                        <p className="text-sm text-gray-600">L'AI ti aiuta, ma la tua personalità fa la differenza</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start">
+                      <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-0.5" />
+                      <div>
+                        <p className="font-medium text-gray-900">Usa regolarmente</p>
+                        <p className="text-sm text-gray-600">Più usi l'AI, più risparmi tempo prezioso</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Profile Tab */}
             {activeTab === 'profile' && (
               <div className="space-y-8">
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-bold text-gray-900">Gestione Profilo</h2>
-                  <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
-                    <Save className="w-4 h-4 mr-2" />
-                    Salva Modifiche
-                  </button>
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => handleAIGenerate('bio-professional')}
+                      className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center"
+                    >
+                      <Bot className="w-4 h-4 mr-2" />
+                      AI Bio
+                    </button>
+                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                      <Save className="w-4 h-4 mr-2" />
+                      Salva Modifiche
+                    </button>
+                  </div>
                 </div>
 
                 <div className="grid lg:grid-cols-2 gap-8">
@@ -430,7 +754,16 @@ export default function PTDashboard() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Bio Professionale</label>
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="block text-sm font-medium text-gray-700">Bio Professionale</label>
+                          <button
+                            onClick={() => handleAIGenerate('bio-professional')}
+                            className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full hover:bg-purple-200 transition-colors flex items-center"
+                          >
+                            <Sparkles className="w-3 h-3 mr-1" />
+                            AI
+                          </button>
+                        </div>
                         <textarea
                           value={profileData.bio}
                           onChange={(e) => handleProfileUpdate('bio', e.target.value)}
@@ -599,7 +932,21 @@ export default function PTDashboard() {
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Descrizione *</label>
+                            <div className="flex items-center justify-between mb-2">
+                              <label className="block text-sm font-medium text-gray-700">Descrizione *</label>
+                              <button
+                                type="button"
+                                onClick={() => handleAIGenerate('program-description', {
+                                  categoria: nuovoProgramma.categoria,
+                                  livello: nuovoProgramma.livello,
+                                  durata: nuovoProgramma.durata
+                                })}
+                                className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full hover:bg-blue-200 transition-colors flex items-center"
+                              >
+                                <Bot className="w-3 h-3 mr-1" />
+                                AI
+                              </button>
+                            </div>
                             <textarea
                               value={nuovoProgramma.descrizione}
                               onChange={(e) => handleNewProgramChange('descrizione', e.target.value)}
@@ -785,6 +1132,18 @@ export default function PTDashboard() {
 
                           <div className="flex items-center space-x-2 ml-6">
                             <button
+                              onClick={() => handleAIGenerate('social-post', {
+                                titolo: programma.titolo,
+                                categoria: programma.categoria,
+                                durata: programma.durata,
+                                prezzo: programma.prezzo
+                              })}
+                              className="p-2 text-gray-400 hover:text-purple-600 transition-colors"
+                              title="Genera post social"
+                            >
+                              <Bot className="w-4 h-4" />
+                            </button>
+                            <button
                               onClick={() => togglePubblicazione(programma.id)}
                               className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                                 programma.pubblicato
@@ -833,17 +1192,6 @@ export default function PTDashboard() {
                         <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                       </label>
                     </div>
-                    
-                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                      <div>
-                        <h4 className="font-medium text-gray-900">Profilo Pubblico</h4>
-                        <p className="text-sm text-gray-600">Rendi visibile il tuo profilo nella directory trainer</p>
-                      </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" defaultChecked />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                      </label>
-                    </div>
                   </div>
                 </div>
 
@@ -861,6 +1209,116 @@ export default function PTDashboard() {
           </div>
         </div>
       </div>
+
+      {/* AI Modal */}
+      {showAiModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center">
+                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center mr-3">
+                  <Bot className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">AI Content Generator</h3>
+                  <p className="text-sm text-gray-500">
+                    {aiContentType === 'program-description' && 'Descrizione Programma'}
+                    {aiContentType === 'bio-professional' && 'Bio Professionale'}
+                    {aiContentType === 'program-titles' && 'Titoli Programma'}
+                    {aiContentType === 'social-post' && 'Post Social Media'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowAiModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <span className="text-2xl">×</span>
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto max-h-96">
+              {isGenerating ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">L'AI sta generando il contenuto...</p>
+                    <p className="text-sm text-gray-500 mt-1">Questo richiederà solo qualche secondo</p>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="font-medium text-gray-900">Contenuto Generato</h4>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => generateAIContent(aiContentType, {})}
+                        className="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-lg transition-colors flex items-center"
+                      >
+                        <RefreshCw className="w-3 h-3 mr-1" />
+                        Rigenera
+                      </button>
+                      <button
+                        onClick={() => copyToClipboard(generatedContent)}
+                        className="text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded-lg transition-colors flex items-center"
+                      >
+                        <Copy className="w-3 h-3 mr-1" />
+                        Copia
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-50 rounded-lg p-4 border">
+                    <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans">
+                      {generatedContent}
+                    </pre>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end space-x-4 p-6 border-t border-gray-200 bg-gray-50">
+              <button
+                onClick={() => setShowAiModal(false)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+              >
+                Chiudi
+              </button>
+              {!isGenerating && (aiContentType === 'program-description' || aiContentType === 'bio-professional') && (
+                <button
+                  onClick={applyGeneratedContent}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors flex items-center"
+                >
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Applica Contenuto
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
-}
+}w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                      <div>
+                        <h4 className="font-medium text-gray-900">Profilo Pubblico</h4>
+                        <p className="text-sm text-gray-600">Rendi visibile il tuo profilo nella directory trainer</p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" className="sr-only peer" defaultChecked />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                      <div>
+                        <h4 className="font-medium text-gray-900">AI Assistant</h4>
+                        <p className="text-sm text-gray-600">Attiva i suggerimenti AI per migliorare i contenuti</p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" className="sr-only peer" defaultChecked />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:
