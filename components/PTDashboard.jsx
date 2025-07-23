@@ -627,20 +627,6 @@ ${context.titolo || 'Il programma che cambierà il tuo fisico'}
                         <p className="text-sm text-gray-600">Prova versioni diverse per vedere cosa funziona meglio</p>
                       </div>
                     </div>
-                    <div className="flex items-start">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-0.5" />
-                      <div>
-                        <p className="font-medium text-gray-900">Mantieni autenticità</p>
-                        <p className="text-sm text-gray-600">L'AI ti aiuta, ma la tua personalità fa la differenza</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-0.5" />
-                      <div>
-                        <p className="font-medium text-gray-900">Usa regolarmente</p>
-                        <p className="text-sm text-gray-600">Più usi l'AI, più risparmi tempo prezioso</p>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -651,78 +637,26 @@ ${context.titolo || 'Il programma che cambierà il tuo fisico'}
               <div className="space-y-8">
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-bold text-gray-900">Gestione Profilo</h2>
-                  <div className="flex space-x-3">
-                    <button
-                      onClick={() => handleAIGenerate('bio-professional')}
-                      className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center"
-                    >
-                      <Bot className="w-4 h-4 mr-2" />
-                      AI Bio
-                    </button>
-                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
-                      <Save className="w-4 h-4 mr-2" />
-                      Salva Modifiche
-                    </button>
-                  </div>
+                  <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
+                    <Save className="w-4 h-4 mr-2" />
+                    Salva Modifiche
+                  </button>
                 </div>
 
-                <div className="grid lg:grid-cols-2 gap-8">
-                  {/* Info Personali */}
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-6">Informazioni Personali</h3>
-                    
-                    {/* Foto Profilo */}
-                    <div className="mb-6">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Foto Profilo</label>
-                      <div className="flex items-center space-x-4">
-                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden">
-                          {profileData.fotoProfile ? (
-                            <img src={URL.createObjectURL(profileData.fotoProfile)} className="w-full h-full object-cover" />
-                          ) : (
-                            <Camera className="w-8 h-8 text-gray-400" />
-                          )}
-                        </div>
-                        <div>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleFileUpload('profile', e.target.files[0])}
-                            className="hidden"
-                            id="photo-upload"
-                          />
-                          <label
-                            htmlFor="photo-upload"
-                            className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors cursor-pointer inline-flex items-center"
-                          >
-                            <Upload className="w-4 h-4 mr-2" />
-                            Carica Foto
-                          </label>
-                        </div>
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6">Informazioni Personali</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Nome</label>
+                        <input
+                          type="text"
+                          value={profileData.nome}
+                          onChange={(e) => handleProfileUpdate('nome', e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        />
                       </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Nome</label>
-                          <input
-                            type="text"
-                            value={profileData.nome}
-                            onChange={(e) => handleProfileUpdate('nome', e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Cognome</label>
-                          <input
-                            type="text"
-                            value={profileData.cognome}
-                            onChange={(e) => handleProfileUpdate('cognome', e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          />
-                        </div>
-                      </div>
-
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                         <input
@@ -732,157 +666,26 @@ ${context.titolo || 'Il programma che cambierà il tuo fisico'}
                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                       </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Telefono</label>
-                        <input
-                          type="tel"
-                          value={profileData.telefono}
-                          onChange={(e) => handleProfileUpdate('telefono', e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Città</label>
-                        <input
-                          type="text"
-                          value={profileData.citta}
-                          onChange={(e) => handleProfileUpdate('citta', e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                      </div>
-
-                      <div>
-                        <div className="flex items-center justify-between mb-2">
-                          <label className="block text-sm font-medium text-gray-700">Bio Professionale</label>
-                          <button
-                            onClick={() => handleAIGenerate('bio-professional')}
-                            className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full hover:bg-purple-200 transition-colors flex items-center"
-                          >
-                            <Sparkles className="w-3 h-3 mr-1" />
-                            AI
-                          </button>
-                        </div>
-                        <textarea
-                          value={profileData.bio}
-                          onChange={(e) => handleProfileUpdate('bio', e.target.value)}
-                          rows={4}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="Racconta la tua esperienza e specializzazioni..."
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Info Professionali & Social */}
-                  <div className="space-y-6">
-                    {/* Info Professionali */}
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-6">Informazioni Professionali</h3>
-                      
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Anni di Esperienza</label>
-                          <input
-                            type="number"
-                            value={profileData.anniEsperienza}
-                            onChange={(e) => handleProfileUpdate('anniEsperienza', parseInt(e.target.value))}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Specializzazioni</label>
-                          <div className="grid grid-cols-2 gap-2">
-                            {specializzazioniDisponibili.map((spec) => (
-                              <label key={spec} className="flex items-center">
-                                <input
-                                  type="checkbox"
-                                  checked={profileData.specializzazioni.includes(spec)}
-                                  onChange={() => handleSpecializzazioniChange(spec)}
-                                  className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                />
-                                <span className="text-sm text-gray-700">{spec}</span>
-                              </label>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Certificazioni</label>
-                          <input
-                            type="text"
-                            value={profileData.certificazioni.join(', ')}
-                            onChange={(e) => handleProfileUpdate('certificazioni', e.target.value.split(', '))}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Es: NASM-CPT, FIPE, ISSA"
-                          />
-                        </div>
-                      </div>
                     </div>
 
-                    {/* Social Links */}
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-6">Link Social e Contatti</h3>
-                      
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Instagram</label>
-                          <div className="relative">
-                            <Instagram className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                            <input
-                              type="text"
-                              value={profileData.instagram}
-                              onChange={(e) => handleProfileUpdate('instagram', e.target.value)}
-                              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              placeholder="@tuoaccount"
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Facebook</label>
-                          <div className="relative">
-                            <Facebook className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                            <input
-                              type="text"
-                              value={profileData.facebook}
-                              onChange={(e) => handleProfileUpdate('facebook', e.target.value)}
-                              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              placeholder="TuaPagina"
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">YouTube</label>
-                          <div className="relative">
-                            <Youtube className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                            <input
-                              type="text"
-                              value={profileData.youtube}
-                              onChange={(e) => handleProfileUpdate('youtube', e.target.value)}
-                              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              placeholder="TuoCanale"
-                            />
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Sito Web</label>
-                          <div className="relative">
-                            <Globe className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                            <input
-                              type="url"
-                              value={profileData.sitoWeb}
-                              onChange={(e) => handleProfileUpdate('sitoWeb', e.target.value)}
-                              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              placeholder="www.tuosito.com"
-                            />
-                          </div>
-                        </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-sm font-medium text-gray-700">Bio Professionale</label>
+                        <button
+                          onClick={() => handleAIGenerate('bio-professional')}
+                          className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full hover:bg-purple-200 transition-colors flex items-center"
+                        >
+                          <Sparkles className="w-3 h-3 mr-1" />
+                          AI
+                        </button>
                       </div>
+                      <textarea
+                        value={profileData.bio}
+                        onChange={(e) => handleProfileUpdate('bio', e.target.value)}
+                        rows={4}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="Racconta la tua esperienza e specializzazioni..."
+                      />
                     </div>
                   </div>
                 </div>
@@ -917,146 +720,70 @@ ${context.titolo || 'Il programma che cambierà il tuo fisico'}
                     </div>
 
                     <form onSubmit={handleNewProgramSubmit} className="space-y-6">
-                      <div className="grid lg:grid-cols-2 gap-6">
-                        <div className="space-y-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Titolo Programma *</label>
-                            <input
-                              type="text"
-                              value={nuovoProgramma.titolo}
-                              onChange={(e) => handleNewProgramChange('titolo', e.target.value)}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              placeholder="Es: Massa Muscolare Avanzato"
-                              required
-                            />
-                          </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Titolo Programma</label>
+                        <input
+                          type="text"
+                          value={nuovoProgramma.titolo}
+                          onChange={(e) => handleNewProgramChange('titolo', e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Es: Massa Muscolare Avanzato"
+                          required
+                        />
+                      </div>
 
-                          <div>
-                            <div className="flex items-center justify-between mb-2">
-                              <label className="block text-sm font-medium text-gray-700">Descrizione *</label>
-                              <button
-                                type="button"
-                                onClick={() => handleAIGenerate('program-description', {
-                                  categoria: nuovoProgramma.categoria,
-                                  livello: nuovoProgramma.livello,
-                                  durata: nuovoProgramma.durata
-                                })}
-                                className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full hover:bg-blue-200 transition-colors flex items-center"
-                              >
-                                <Bot className="w-3 h-3 mr-1" />
-                                AI
-                              </button>
-                            </div>
-                            <textarea
-                              value={nuovoProgramma.descrizione}
-                              onChange={(e) => handleNewProgramChange('descrizione', e.target.value)}
-                              rows={4}
-                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              placeholder="Descrivi il programma, gli obiettivi e cosa include..."
-                              required
-                            />
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">Prezzo (€) *</label>
-                              <input
-                                type="number"
-                                step="0.01"
-                                value={nuovoProgramma.prezzo}
-                                onChange={(e) => handleNewProgramChange('prezzo', e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="29.99"
-                                required
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">Durata *</label>
-                              <input
-                                type="text"
-                                value={nuovoProgramma.durata}
-                                onChange={(e) => handleNewProgramChange('durata', e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="8 settimane"
-                                required
-                              />
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">Categoria *</label>
-                              <select
-                                value={nuovoProgramma.categoria}
-                                onChange={(e) => handleNewProgramChange('categoria', e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                required
-                              >
-                                <option value="">Seleziona categoria</option>
-                                {categorie.map(cat => (
-                                  <option key={cat} value={cat}>{cat}</option>
-                                ))}
-                              </select>
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-2">Livello *</label>
-                              <select
-                                value={nuovoProgramma.livello}
-                                onChange={(e) => handleNewProgramChange('livello', e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                required
-                              >
-                                <option value="">Seleziona livello</option>
-                                {livelli.map(livello => (
-                                  <option key={livello} value={livello}>{livello}</option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="block text-sm font-medium text-gray-700">Descrizione</label>
+                          <button
+                            type="button"
+                            onClick={() => handleAIGenerate('program-description', {
+                              categoria: nuovoProgramma.categoria,
+                              livello: nuovoProgramma.livello,
+                              durata: nuovoProgramma.durata
+                            })}
+                            className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full hover:bg-blue-200 transition-colors flex items-center"
+                          >
+                            <Bot className="w-3 h-3 mr-1" />
+                            AI
+                          </button>
                         </div>
+                        <textarea
+                          value={nuovoProgramma.descrizione}
+                          onChange={(e) => handleNewProgramChange('descrizione', e.target.value)}
+                          rows={4}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Descrivi il programma, gli obiettivi e cosa include..."
+                          required
+                        />
+                      </div>
 
-                        <div className="space-y-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Copertina Programma</label>
-                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
-                              <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
-                              <p className="mt-2 text-sm text-gray-600">
-                                Trascina qui l'immagine di copertina o
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  onChange={(e) => handleNewProgramChange('copertina', e.target.files[0])}
-                                  className="hidden"
-                                  id="copertina-upload"
-                                />
-                                <label htmlFor="copertina-upload" className="text-blue-600 hover:text-blue-500 ml-1 cursor-pointer">
-                                  clicca per selezionare
-                                </label>
-                              </p>
-                              <p className="text-xs text-gray-500 mt-1">PNG, JPG fino a 10MB</p>
-                            </div>
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">File Programma (PDF)</label>
-                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
-                              <FileText className="mx-auto h-12 w-12 text-gray-400" />
-                              <p className="mt-2 text-sm text-gray-600">
-                                Trascina qui il file PDF o
-                                <input
-                                  type="file"
-                                  accept=".pdf"
-                                  onChange={(e) => handleNewProgramChange('file', e.target.files[0])}
-                                  className="hidden"
-                                  id="file-upload"
-                                />
-                                <label htmlFor="file-upload" className="text-blue-600 hover:text-blue-500 ml-1 cursor-pointer">
-                                  clicca per selezionare
-                                </label>
-                              </p>
-                              <p className="text-xs text-gray-500 mt-1">PDF fino a 50MB</p>
-                            </div>
-                          </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Prezzo (€)</label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            value={nuovoProgramma.prezzo}
+                            onChange={(e) => handleNewProgramChange('prezzo', e.target.value)}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="29.99"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
+                          <select
+                            value={nuovoProgramma.categoria}
+                            onChange={(e) => handleNewProgramChange('categoria', e.target.value)}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            required
+                          >
+                            <option value="">Seleziona categoria</option>
+                            {categorie.map(cat => (
+                              <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                          </select>
                         </div>
                       </div>
 
@@ -1102,25 +829,11 @@ ${context.titolo || 'Il programma che cambierà il tuo fisico'}
                               </span>
                             </div>
                             
-                            <p className="text-gray-600 mb-4 line-clamp-2">{programma.descrizione}</p>
+                            <p className="text-gray-600 mb-4">{programma.descrizione}</p>
                             
                             <div className="flex items-center space-x-6 text-sm text-gray-500">
-                              <span className="flex items-center">
-                                <Target className="w-4 h-4 mr-1" />
-                                {programma.categoria}
-                              </span>
-                              <span className="flex items-center">
-                                <Clock className="w-4 h-4 mr-1" />
-                                {programma.durata}
-                              </span>
-                              <span className="flex items-center">
-                                <DollarSign className="w-4 h-4 mr-1" />
-                                €{programma.prezzo}
-                              </span>
-                              <span className="flex items-center">
-                                <Users className="w-4 h-4 mr-1" />
-                                {programma.vendite} vendite
-                              </span>
+                              <span>€{programma.prezzo}</span>
+                              <span>{programma.vendite} vendite</span>
                               {programma.rating > 0 && (
                                 <span className="flex items-center">
                                   <Star className="w-4 h-4 mr-1 text-yellow-400" />
@@ -1153,12 +866,6 @@ ${context.titolo || 'Il programma che cambierà il tuo fisico'}
                             >
                               {programma.pubblicato ? 'Nascondi' : 'Pubblica'}
                             </button>
-                            <button className="p-2 text-gray-400 hover:text-blue-600 transition-colors">
-                              <Edit className="w-4 h-4" />
-                            </button>
-                            <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                              <Eye className="w-4 h-4" />
-                            </button>
                             <button 
                               onClick={() => handleDeleteProgram(programma.id)}
                               className="p-2 text-gray-400 hover:text-red-600 transition-colors"
@@ -1187,22 +894,17 @@ ${context.titolo || 'Il programma che cambierà il tuo fisico'}
                         <h4 className="font-medium text-gray-900">Notifiche Email</h4>
                         <p className="text-sm text-gray-600">Ricevi notifiche per nuove vendite e messaggi</p>
                       </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" defaultChecked />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                      </label>
+                      <input type="checkbox" defaultChecked className="w-4 h-4 text-blue-600" />
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                      <div>
+                        <h4 className="font-medium text-gray-900">AI Assistant</h4>
+                        <p className="text-sm text-gray-600">Attiva i suggerimenti AI per migliorare i contenuti</p>
+                      </div>
+                      <input type="checkbox" defaultChecked className="w-4 h-4 text-blue-600" />
                     </div>
                   </div>
-                </div>
-
-                <div className="bg-red-50 border border-red-200 rounded-xl p-6">
-                  <h3 className="text-lg font-semibold text-red-900 mb-4">Zona Pericolosa</h3>
-                  <p className="text-red-700 mb-4">
-                    Queste azioni sono irreversibili. Procedi con cautela.
-                  </p>
-                  <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">
-                    Elimina Account
-                  </button>
                 </div>
               </div>
             )}
@@ -1299,26 +1001,4 @@ ${context.titolo || 'Il programma che cambierà il tuo fisico'}
       )}
     </div>
   );
-}w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                      </label>
-                    </div>
-                    
-                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                      <div>
-                        <h4 className="font-medium text-gray-900">Profilo Pubblico</h4>
-                        <p className="text-sm text-gray-600">Rendi visibile il tuo profilo nella directory trainer</p>
-                      </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" defaultChecked />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                      </label>
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                      <div>
-                        <h4 className="font-medium text-gray-900">AI Assistant</h4>
-                        <p className="text-sm text-gray-600">Attiva i suggerimenti AI per migliorare i contenuti</p>
-                      </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" className="sr-only peer" defaultChecked />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:
+}
