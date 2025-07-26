@@ -23,9 +23,9 @@ import {
 
 // Import dei componenti completi
 import DashboardOverview from './dashboard/DashboardOverview';
-import ProfileManagement from './ProfileManagement';
-import ProgramsManagement from './ProgramsManagement';
-import SettingsPanel from './SettingsPanel';
+import ProfileManagement from './dashboard/ProfileManagement';
+import ProgramsManagement from './dashboard/ProgramsManagement';
+import SettingsPanel from './dashboard/SettingsPanel';
 import AIAssistantPotenziata from './AIAssistantPotenziata';
 
 export default function PTDashboard() {
