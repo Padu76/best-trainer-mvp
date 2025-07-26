@@ -306,158 +306,100 @@ export default function BestTrainerMVP() {
         </div>
       </section>
 
-      {/* Come Funziona - Redesigned */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 relative overflow-hidden">
+      {/* Come Funziona - Compact */}
+      <section className="py-16 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800 relative overflow-hidden">
         {/* Background decorations */}
         <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 w-32 h-32 bg-blue-100 rounded-full opacity-30 blur-2xl"></div>
-          <div className="absolute bottom-20 right-10 w-24 h-24 bg-purple-100 rounded-full opacity-40 blur-xl"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-green-100 rounded-full opacity-20 blur-3xl"></div>
+          <div className="absolute top-10 left-10 w-24 h-24 bg-blue-500/10 rounded-full blur-xl"></div>
+          <div className="absolute bottom-10 right-10 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-6 relative">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl mb-6 mx-auto">
-              <Target className="w-8 h-8 text-white" />
-            </div>
-            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-              Come Funziona? <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">🚀</span>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+              Come Funziona? <span className="text-blue-400">🚀</span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              <strong>Tre semplici passi</strong> per iniziare la tua trasformazione e raggiungere <strong>risultati concreti</strong>
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+              <strong>Tre semplici passi</strong> per iniziare la tua trasformazione
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8 mb-16">
+          <div className="grid lg:grid-cols-3 gap-6">
             {/* Step 1 */}
             <div className="group relative">
-              <div className="bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 relative overflow-hidden">
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 
                 <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                      <Search className="w-8 h-8 text-white" />
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
+                      <Search className="w-6 h-6 text-white" />
                     </div>
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-xl font-bold text-blue-600">1</span>
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-sm font-bold text-blue-600">1</span>
                     </div>
                   </div>
                   
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors">
+                  <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
                     🔍 Cerca & Filtra
                   </h3>
-                  <p className="text-gray-600 leading-relaxed mb-6">
-                    Usa i nostri <strong className="text-gray-800">filtri intelligenti</strong> per trovare programmi 
-                    perfetti per il tuo obiettivo, livello e sport preferito
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    Usa i nostri <strong>filtri intelligenti</strong> per trovare programmi 
+                    per il tuo obiettivo e livello
                   </p>
-                  
-                  <div className="flex items-center text-sm text-blue-600 font-medium group-hover:text-blue-700">
-                    <ArrowRight className="w-4 h-4 mr-2 transform group-hover:translate-x-1 transition-transform" />
-                    Inizia la ricerca
-                  </div>
                 </div>
               </div>
             </div>
 
             {/* Step 2 */}
             <div className="group relative">
-              <div className="bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 relative overflow-hidden">
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 
                 <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                      <Star className="w-8 h-8 text-white" />
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
+                      <Star className="w-6 h-6 text-white" />
                     </div>
-                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                      <span className="text-xl font-bold text-purple-600">2</span>
+                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                      <span className="text-sm font-bold text-purple-600">2</span>
                     </div>
                   </div>
                   
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-purple-600 transition-colors">
+                  <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-purple-600 transition-colors">
                     ⭐ Scegli il Migliore
                   </h3>
-                  <p className="text-gray-600 leading-relaxed mb-6">
-                    Leggi <strong className="text-gray-800">recensioni verificate</strong>, confronta trainer certificati 
-                    e scegli il programma che fa per te
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    Leggi <strong>recensioni verificate</strong>, confronta trainer 
+                    e scegli il programma perfetto
                   </p>
-                  
-                  <div className="flex items-center text-sm text-purple-600 font-medium group-hover:text-purple-700">
-                    <ArrowRight className="w-4 h-4 mr-2 transform group-hover:translate-x-1 transition-transform" />
-                    Confronta programmi
-                  </div>
                 </div>
               </div>
             </div>
 
             {/* Step 3 */}
             <div className="group relative">
-              <div className="bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 relative overflow-hidden">
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-200 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 
                 <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-2xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300 shadow-lg">
-                      <Trophy className="w-8 h-8 text-white" />
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
+                      <Trophy className="w-6 h-6 text-white" />
                     </div>
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                      <span className="text-xl font-bold text-green-600">3</span>
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <span className="text-sm font-bold text-green-600">3</span>
                     </div>
                   </div>
                   
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4 group-hover:text-green-600 transition-colors">
-                    🏆 Raggiungi i Tuoi Obiettivi
+                  <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-green-600 transition-colors">
+                    🏆 Raggiungi gli Obiettivi
                   </h3>
-                  <p className="text-gray-600 leading-relaxed mb-6">
-                    <strong className="text-gray-800">Download immediato</strong> e supporto costante del trainer 
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    <strong>Download immediato</strong> e supporto del trainer 
                     per trasformare il tuo fisico
                   </p>
-                  
-                  <div className="flex items-center text-sm text-green-600 font-medium group-hover:text-green-700">
-                    <ArrowRight className="w-4 h-4 mr-2 transform group-hover:translate-x-1 transition-transform" />
-                    Inizia subito
-                  </div>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom CTA */}
-          <div className="text-center">
-            <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100 max-w-2xl mx-auto">
-              <div className="flex items-center justify-center mb-6">
-                <div className="w-20 h-20 bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 rounded-3xl flex items-center justify-center">
-                  <Users className="w-10 h-10 text-white" />
-                </div>
-              </div>
-              
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                Inizia Oggi la Tua <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">Trasformazione</span>
-              </h3>
-              <p className="text-gray-600 mb-8 leading-relaxed">
-                Unisciti a <strong className="text-gray-800">15,000+ persone</strong> che hanno già raggiunto i loro obiettivi 
-                con programmi professionali e trainer certificati
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/programmi"
-                  className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center transform hover:scale-105 shadow-lg hover:shadow-xl"
-                >
-                  <Search className="w-5 h-5 mr-2" />
-                  Esplora Programmi
-                </Link>
-                <Link
-                  href="/tutorial-esercizi"
-                  className="border-2 border-gray-300 hover:border-purple-400 text-gray-700 hover:text-purple-600 px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center transform hover:scale-105"
-                >
-                  <Play className="w-5 h-5 mr-2" />
-                  Prova Gratis
-                </Link>
               </div>
             </div>
           </div>
