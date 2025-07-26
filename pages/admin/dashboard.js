@@ -1,661 +1,385 @@
 import React, { useState, useEffect } from 'react';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import AdminDashboard from '../../components/AdminDashboard';
 import { 
-  Users, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
-  Filter, 
-  Search, 
-  Eye, 
-  Download, 
-  FileText, 
-  Award, 
-  MapPin, 
-  Mail, 
-  Phone, 
-  Calendar, 
-  AlertTriangle, 
   Shield, 
-  Star, 
-  TrendingUp,
-  Send,
-  MoreVertical,
-  ThumbsUp,
-  ThumbsDown,
-  MessageSquare,
-  Linkedin,
-  Instagram,
-  Globe,
-  User,
-  RefreshCw
+  Eye, 
+  EyeOff, 
+  Lock, 
+  User, 
+  AlertTriangle,
+  CheckCircle,
+  LogOut
 } from 'lucide-react';
 
-export default function AdminDashboard() {
-  const [applications, setApplications] = useState([]);
-  const [filteredApplications, setFilteredApplications] = useState([]);
-  const [selectedApplication, setSelectedApplication] = useState(null);
-  const [filters, setFilters] = useState({
-    status: 'all',
-    search: '',
-    dateRange: 'all',
-    score: 'all'
+// Componente di autenticazione admin
+function AdminLogin({ onLogin }) {
+  const [credentials, setCredentials] = useState({
+    username: '',
+    password: ''
   });
-  const [stats, setStats] = useState({
-    total: 0,
-    pending: 0,
-    approved: 0,
-    rejected: 0,
-    underReview: 0
-  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Mock data per demo
-  const mockApplications = [
-    {
-      id: 'PT-1638123456789',
-      nome: 'Marco',
-      cognome: 'Rossi',
-      email: 'marco.rossi@email.com',
-      telefono: '+39 349 123 4567',
-      citta: 'Milano',
-      anniEsperienza: '5-10',
-      specializzazioni: ['Bodybuilding & Massa Muscolare', 'Powerlifting & Forza'],
-      certificazioni: ['coni', 'fipe', 'nasm'],
-      titoloDiStudio: 'laurea-scienze-motorie',
-      linkedinProfile: 'https://linkedin.com/in/marcorossi',
-      instagramProfile: '@marco.trainer',
-      motivazione: 'Voglio far parte di Best-Trainer perché credo nella qualità e nella professionalità. Ho aiutato oltre 200 clienti a raggiungere i loro obiettivi.',
-      status: 'pending',
-      submissionDate: '2024-01-15T10:30:00Z',
-      completionScore: 95,
-      documentsUploaded: 4,
-      documentsRequired: 4,
-      adminNotes: '',
-      reviewedBy: null,
-      reviewDate: null
-    },
-    {
-      id: 'PT-1638123456790',
-      nome: 'Sofia',
-      cognome: 'Bianchi',
-      email: 'sofia.bianchi@email.com',
-      telefono: '+39 347 987 6543',
-      citta: 'Roma',
-      anniEsperienza: '3-5',
-      specializzazioni: ['Dimagrimento & Tonificazione', 'Functional Training'],
-      certificazioni: ['coni', 'asi', 'issa'],
-      titoloDiStudio: 'laurea-scienze-motorie',
-      linkedinProfile: 'https://linkedin.com/in/sofiabianchi',
-      instagramProfile: '@sofia.fitness',
-      motivazione: 'La mia passione è aiutare le donne a sentirsi sicure del proprio corpo attraverso l\'allenamento personalizzato.',
-      status: 'under-review',
-      submissionDate: '2024-01-14T14:15:00Z',
-      completionScore: 88,
-      documentsUploaded: 3,
-      documentsRequired: 4,
-      adminNotes: 'Manca certificazione CONI aggiornata',
-      reviewedBy: 'Admin 1',
-      reviewDate: '2024-01-16T09:00:00Z'
-    },
-    {
-      id: 'PT-1638123456791',
-      nome: 'Andrea',
-      cognome: 'Verdi',
-      email: 'andrea.verdi@email.com',
-      telefono: '+39 335 456 7890',
-      citta: 'Torino',
-      anniEsperienza: '10+',
-      specializzazioni: ['Preparazione Atletica', 'Functional Training', 'Crossfit'],
-      certificazioni: ['coni', 'fipe', 'acsm', 'nasm'],
-      titoloDiStudio: 'laurea-scienze-motorie',
-      linkedinProfile: 'https://linkedin.com/in/andreaverdi',
-      instagramProfile: '@andrea.coach',
-      motivazione: 'Con 12 anni di esperienza nella preparazione atletica, voglio condividere le mie competenze con una community di professionisti.',
-      status: 'approved',
-      submissionDate: '2024-01-12T16:45:00Z',
-      completionScore: 98,
-      documentsUploaded: 5,
-      documentsRequired: 4,
-      adminNotes: 'Profilo eccellente, esperienza comprovata',
-      reviewedBy: 'Admin 2',
-      reviewDate: '2024-01-13T11:30:00Z'
-    },
-    {
-      id: 'PT-1638123456792',
-      nome: 'Elena',
-      cognome: 'Russo',
-      email: 'elena.russo@email.com',
-      telefono: '+39 348 111 2222',
-      citta: 'Napoli',
-      anniEsperienza: '1-3',
-      specializzazioni: ['Yoga & Stretching', 'Pilates'],
-      certificazioni: ['asi'],
-      titoloDiStudio: 'diploma',
-      linkedinProfile: 'https://linkedin.com/in/elenarusso',
-      instagramProfile: '@elena.yoga',
-      motivazione: 'Sono appassionata di yoga e voglio diffondere i benefici di questa disciplina.',
-      status: 'rejected',
-      submissionDate: '2024-01-10T12:20:00Z',
-      completionScore: 65,
-      documentsUploaded: 2,
-      documentsRequired: 4,
-      adminNotes: 'Certificazioni insufficienti, esperienza limitata',
-      reviewedBy: 'Admin 1',
-      reviewDate: '2024-01-11T15:45:00Z'
-    }
-  ];
-
-  useEffect(() => {
-    // Simula caricamento dati
-    setApplications(mockApplications);
-    setFilteredApplications(mockApplications);
-    
-    // Calcola statistiche
-    const newStats = {
-      total: mockApplications.length,
-      pending: mockApplications.filter(app => app.status === 'pending').length,
-      approved: mockApplications.filter(app => app.status === 'approved').length,
-      rejected: mockApplications.filter(app => app.status === 'rejected').length,
-      underReview: mockApplications.filter(app => app.status === 'under-review').length
-    };
-    setStats(newStats);
-  }, []);
-
-  useEffect(() => {
-    let filtered = applications;
-
-    // Filtro per status
-    if (filters.status !== 'all') {
-      filtered = filtered.filter(app => app.status === filters.status);
-    }
-
-    // Filtro per ricerca
-    if (filters.search) {
-      filtered = filtered.filter(app => 
-        app.nome.toLowerCase().includes(filters.search.toLowerCase()) ||
-        app.cognome.toLowerCase().includes(filters.search.toLowerCase()) ||
-        app.email.toLowerCase().includes(filters.search.toLowerCase()) ||
-        app.citta.toLowerCase().includes(filters.search.toLowerCase())
-      );
-    }
-
-    // Filtro per score
-    if (filters.score !== 'all') {
-      if (filters.score === 'high') {
-        filtered = filtered.filter(app => app.completionScore >= 90);
-      } else if (filters.score === 'medium') {
-        filtered = filtered.filter(app => app.completionScore >= 70 && app.completionScore < 90);
-      } else if (filters.score === 'low') {
-        filtered = filtered.filter(app => app.completionScore < 70);
-      }
-    }
-
-    setFilteredApplications(filtered);
-  }, [filters, applications]);
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'under-review': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'approved': return 'bg-green-100 text-green-800 border-green-200';
-      case 'rejected': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
+  // Credenziali demo (in produzione usare sistema sicuro)
+  const ADMIN_CREDENTIALS = {
+    'admin': 'besttrainer2024',
+    'supervisor': 'supervisor123',
+    'manager': 'manager456'
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'pending': return <Clock className="w-4 h-4" />;
-      case 'under-review': return <Eye className="w-4 h-4" />;
-      case 'approved': return <CheckCircle className="w-4 h-4" />;
-      case 'rejected': return <XCircle className="w-4 h-4" />;
-      default: return <AlertTriangle className="w-4 h-4" />;
-    }
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
 
-  const getScoreColor = (score) => {
-    if (score >= 90) return 'text-green-600 bg-green-100';
-    if (score >= 70) return 'text-yellow-600 bg-yellow-100';
-    return 'text-red-600 bg-red-100';
-  };
-
-  const handleStatusChange = (applicationId, newStatus, notes = '') => {
-    setApplications(prev => prev.map(app => 
-      app.id === applicationId 
-        ? { 
-            ...app, 
-            status: newStatus, 
-            adminNotes: notes,
-            reviewedBy: 'Admin Current',
-            reviewDate: new Date().toISOString()
-          }
-        : app
-    ));
-    
-    // Simula invio email
+    // Simula chiamata API
     setTimeout(() => {
-      alert(`Email di ${newStatus === 'approved' ? 'approvazione' : 'rifiuto'} inviata con successo!`);
-    }, 500);
-  };
-
-  const sendMessage = (applicationId, message) => {
-    // Simula invio messaggio
-    alert(`Messaggio inviato a ${applications.find(app => app.id === applicationId)?.email}`);
+      if (ADMIN_CREDENTIALS[credentials.username] === credentials.password) {
+        const adminData = {
+          username: credentials.username,
+          role: credentials.username === 'admin' ? 'Super Admin' : 
+                credentials.username === 'supervisor' ? 'Supervisor' : 'Manager',
+          loginTime: new Date().toISOString(),
+          permissions: credentials.username === 'admin' ? 'full' : 'limited'
+        };
+        
+        // Salva in localStorage (in produzione usare JWT/session sicura)
+        localStorage.setItem('admin_session', JSON.stringify(adminData));
+        onLogin(adminData);
+      } else {
+        setError('Credenziali non valide');
+      }
+      setIsLoading(false);
+    }, 1000);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 flex items-center justify-center">
+      <div className="max-w-md w-full mx-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Shield className="w-8 h-8 text-blue-600" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+            <p className="text-gray-600 mt-2">Accesso riservato agli amministratori</p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Admin Dashboard - PT Network
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Gestione richieste di accesso Personal Trainer
-              </p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Aggiorna
-              </button>
-              <button className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                <Download className="w-4 h-4 mr-2" />
-                Esporta
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Totale Richieste</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-              </div>
-              <Users className="w-8 h-8 text-blue-600" />
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">In Attesa</p>
-                <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
-              </div>
-              <Clock className="w-8 h-8 text-yellow-600" />
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">In Revisione</p>
-                <p className="text-2xl font-bold text-blue-600">{stats.underReview}</p>
-              </div>
-              <Eye className="w-8 h-8 text-blue-600" />
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Approvate</p>
-                <p className="text-2xl font-bold text-green-600">{stats.approved}</p>
-              </div>
-              <CheckCircle className="w-8 h-8 text-green-600" />
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-sm border">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Rifiutate</p>
-                <p className="text-2xl font-bold text-red-600">{stats.rejected}</p>
-              </div>
-              <XCircle className="w-8 h-8 text-red-600" />
-            </div>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="bg-white p-6 rounded-xl shadow-sm border mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-              <select
-                value={filters.status}
-                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="all">Tutti gli Status</option>
-                <option value="pending">In Attesa</option>
-                <option value="under-review">In Revisione</option>
-                <option value="approved">Approvate</option>
-                <option value="rejected">Rifiutate</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Score</label>
-              <select
-                value={filters.score}
-                onChange={(e) => setFilters(prev => ({ ...prev, score: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="all">Tutti i Score</option>
-                <option value="high">Alto (90+)</option>
-                <option value="medium">Medio (70-89)</option>
-                <option value="low">Basso (&lt;70)</option>
-              </select>
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Ricerca</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Username
+              </label>
               <div className="relative">
-                <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+                <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
-                  value={filters.search}
-                  onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                  placeholder="Cerca per nome, email, città..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  value={credentials.username}
+                  onChange={(e) => setCredentials(prev => ({ ...prev, username: e.target.value }))}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Inserisci username"
+                  required
                 />
               </div>
             </div>
-          </div>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Applications List */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-sm border">
-              <div className="p-6 border-b">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Richieste ({filteredApplications.length})
-                  </h2>
-                  <div className="text-sm text-gray-500">
-                    Aggiornato: {new Date().toLocaleTimeString('it-IT')}
-                  </div>
-                </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={credentials.password}
+                  onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
+                  className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Inserisci password"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
               </div>
+            </div>
 
-              <div className="divide-y divide-gray-200">
-                {filteredApplications.map((application) => (
-                  <div
-                    key={application.id}
-                    className={`p-6 hover:bg-gray-50 cursor-pointer transition-colors ${
-                      selectedApplication?.id === application.id ? 'bg-blue-50 border-l-4 border-blue-600' : ''
-                    }`}
-                    onClick={() => setSelectedApplication(application)}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="font-semibold text-gray-900">
-                            {application.nome} {application.cognome}
-                          </h3>
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(application.status)}`}>
-                            {getStatusIcon(application.status)}
-                            <span className="ml-1 capitalize">{application.status.replace('-', ' ')}</span>
-                          </span>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getScoreColor(application.completionScore)}`}>
-                            {application.completionScore}%
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 text-sm text-gray-600 mb-3">
-                          <div className="flex items-center">
-                            <Mail className="w-4 h-4 mr-2" />
-                            {application.email}
-                          </div>
-                          <div className="flex items-center">
-                            <MapPin className="w-4 h-4 mr-2" />
-                            {application.citta}
-                          </div>
-                          <div className="flex items-center">
-                            <Award className="w-4 h-4 mr-2" />
-                            {application.anniEsperienza} anni
-                          </div>
-                          <div className="flex items-center">
-                            <FileText className="w-4 h-4 mr-2" />
-                            {application.documentsUploaded}/{application.documentsRequired} docs
-                          </div>
-                        </div>
-
-                        <div className="flex flex-wrap gap-1">
-                          {application.specializzazioni.slice(0, 2).map((spec, index) => (
-                            <span key={index} className="inline-block bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">
-                              {spec}
-                            </span>
-                          ))}
-                          {application.specializzazioni.length > 2 && (
-                            <span className="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
-                              +{application.specializzazioni.length - 2}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="text-right text-sm text-gray-500">
-                        <div>{new Date(application.submissionDate).toLocaleDateString('it-IT')}</div>
-                        <div className="text-xs">{new Date(application.submissionDate).toLocaleTimeString('it-IT')}</div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center">
+                <AlertTriangle className="w-5 h-5 text-red-600 mr-2" />
+                <span className="text-red-700 text-sm">{error}</span>
               </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Verifica in corso...
+                </>
+              ) : (
+                <>
+                  <Shield className="w-5 h-5 mr-2" />
+                  Accedi alla Dashboard
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Demo Credentials */}
+          <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <h3 className="text-sm font-medium text-yellow-800 mb-2">Credenziali Demo:</h3>
+            <div className="text-xs text-yellow-700 space-y-1">
+              <div><strong>admin</strong> / besttrainer2024 (Accesso completo)</div>
+              <div><strong>supervisor</strong> / supervisor123 (Accesso limitato)</div>
+              <div><strong>manager</strong> / manager456 (Accesso base)</div>
             </div>
           </div>
 
-          {/* Application Detail Panel */}
-          <div className="lg:col-span-1">
-            {selectedApplication ? (
-              <div className="bg-white rounded-xl shadow-sm border sticky top-8">
-                <div className="p-6 border-b">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Dettagli Richiesta
-                    </h3>
-                    <button className="text-gray-400 hover:text-gray-600">
-                      <MoreVertical className="w-5 h-5" />
-                    </button>
-                  </div>
+          {/* Security Notice */}
+          <div className="mt-6 text-center">
+            <p className="text-xs text-gray-500">
+              Accesso protetto da crittografia SSL e autenticazione a due fattori
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-                  <div className="flex items-center space-x-3 mb-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                      <User className="w-6 h-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900">
-                        {selectedApplication.nome} {selectedApplication.cognome}
-                      </h4>
-                      <p className="text-sm text-gray-600">{selectedApplication.email}</p>
-                    </div>
-                  </div>
+// Componente header admin con logout
+function AdminHeader({ adminData, onLogout }) {
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(selectedApplication.status)}`}>
-                    {getStatusIcon(selectedApplication.status)}
-                    <span className="ml-2 capitalize">{selectedApplication.status.replace('-', ' ')}</span>
-                  </span>
-                </div>
+  return (
+    <div className="bg-blue-900 text-white shadow-lg">
+      <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center">
+              <Shield className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold">Best-Trainer Admin</h1>
+              <p className="text-blue-200 text-sm">Sistema di gestione PT Network</p>
+            </div>
+          </div>
 
-                <div className="p-6 space-y-6">
-                  {/* Score */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-700">Completion Score</span>
-                      <span className={`text-sm font-semibold ${selectedApplication.completionScore >= 90 ? 'text-green-600' : selectedApplication.completionScore >= 70 ? 'text-yellow-600' : 'text-red-600'}`}>
-                        {selectedApplication.completionScore}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className={`h-2 rounded-full ${selectedApplication.completionScore >= 90 ? 'bg-green-500' : selectedApplication.completionScore >= 70 ? 'bg-yellow-500' : 'bg-red-500'}`}
-                        style={{ width: `${selectedApplication.completionScore}%` }}
-                      ></div>
-                    </div>
-                  </div>
-
-                  {/* Info Personali */}
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-3">Info Personali</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center">
-                        <Phone className="w-4 h-4 text-gray-400 mr-2" />
-                        {selectedApplication.telefono}
-                      </div>
-                      <div className="flex items-center">
-                        <MapPin className="w-4 h-4 text-gray-400 mr-2" />
-                        {selectedApplication.citta}
-                      </div>
-                      <div className="flex items-center">
-                        <Award className="w-4 h-4 text-gray-400 mr-2" />
-                        {selectedApplication.anniEsperienza} anni esperienza
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Certificazioni */}
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-3">Certificazioni</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedApplication.certificazioni.map((cert, index) => (
-                        <span key={index} className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full uppercase font-medium">
-                          {cert}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Social Media */}
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-3">Presenza Online</h4>
-                    <div className="space-y-2">
-                      {selectedApplication.linkedinProfile && (
-                        <a 
-                          href={selectedApplication.linkedinProfile} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="flex items-center text-sm text-blue-600 hover:underline"
-                        >
-                          <Linkedin className="w-4 h-4 mr-2" />
-                          LinkedIn Profile
-                        </a>
-                      )}
-                      {selectedApplication.instagramProfile && (
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Instagram className="w-4 h-4 mr-2" />
-                          {selectedApplication.instagramProfile}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Motivazione */}
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-3">Motivazione</h4>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      {selectedApplication.motivazione}
-                    </p>
-                  </div>
-
-                  {/* Admin Notes */}
-                  {selectedApplication.adminNotes && (
-                    <div>
-                      <h4 className="font-medium text-gray-900 mb-3">Note Admin</h4>
-                      <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                        {selectedApplication.adminNotes}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Actions */}
-                  {selectedApplication.status === 'pending' || selectedApplication.status === 'under-review' ? (
-                    <div className="space-y-3">
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => handleStatusChange(selectedApplication.id, 'approved', 'Richiesta approvata - profilo conforme ai requisiti')}
-                          className="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
-                        >
-                          <ThumbsUp className="w-4 h-4 mr-2" />
-                          Approva
-                        </button>
-                        <button
-                          onClick={() => handleStatusChange(selectedApplication.id, 'rejected', 'Richiesta rifiutata - requisiti non soddisfatti')}
-                          className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
-                        >
-                          <ThumbsDown className="w-4 h-4 mr-2" />
-                          Rifiuta
-                        </button>
-                      </div>
-                      
-                      <button
-                        onClick={() => handleStatusChange(selectedApplication.id, 'under-review', 'Richiesta in fase di revisione')}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
-                      >
-                        <Eye className="w-4 h-4 mr-2" />
-                        Metti in Revisione
-                      </button>
-
-                      <button
-                        onClick={() => sendMessage(selectedApplication.id, 'Richiesta informazioni aggiuntive')}
-                        className="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center"
-                      >
-                        <MessageSquare className="w-4 h-4 mr-2" />
-                        Invia Messaggio
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="text-center py-4">
-                      <div className={`inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium ${
-                        selectedApplication.status === 'approved' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {selectedApplication.status === 'approved' ? (
-                          <>
-                            <CheckCircle className="w-4 h-4 mr-2" />
-                            Richiesta Approvata
-                          </>
-                        ) : (
-                          <>
-                            <XCircle className="w-4 h-4 mr-2" />
-                            Richiesta Rifiutata
-                          </>
-                        )}
-                      </div>
-                      {selectedApplication.reviewDate && (
-                        <p className="text-xs text-gray-500 mt-2">
-                          Revisionato il {new Date(selectedApplication.reviewDate).toLocaleDateString('it-IT')} 
-                          da {selectedApplication.reviewedBy}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
+          <div className="relative">
+            <button
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="flex items-center space-x-3 bg-blue-800 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors"
+            >
+              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                <User className="w-4 h-4" />
               </div>
-            ) : (
-              <div className="bg-white rounded-xl shadow-sm border p-6 text-center">
-                <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Seleziona una Richiesta
-                </h3>
-                <p className="text-gray-600">
-                  Clicca su una richiesta dalla lista per visualizzare i dettagli e gestire l'approvazione.
-                </p>
+              <div className="text-left">
+                <div className="text-sm font-medium">{adminData.username}</div>
+                <div className="text-xs text-blue-200">{adminData.role}</div>
+              </div>
+            </button>
+
+            {showUserMenu && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                <div className="px-4 py-2 border-b border-gray-100">
+                  <div className="text-sm font-medium text-gray-900">{adminData.username}</div>
+                  <div className="text-xs text-gray-500">{adminData.role}</div>
+                </div>
+                
+                <button
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    alert('Funzionalità profilo in sviluppo');
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  <User className="w-4 h-4 inline mr-2" />
+                  Profilo
+                </button>
+                
+                <button
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    alert('Funzionalità impostazioni in sviluppo');
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  <Shield className="w-4 h-4 inline mr-2" />
+                  Impostazioni
+                </button>
+                
+                <div className="border-t border-gray-100 mt-1 pt-1">
+                  <button
+                    onClick={onLogout}
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                  >
+                    <LogOut className="w-4 h-4 inline mr-2" />
+                    Logout
+                  </button>
+                </div>
               </div>
             )}
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+// Componente principale della pagina
+export default function AdminDashboardPage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [adminData, setAdminData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Controlla se c'è una sessione admin attiva
+    const checkAuthStatus = () => {
+      try {
+        const session = localStorage.getItem('admin_session');
+        if (session) {
+          const data = JSON.parse(session);
+          // Verifica se la sessione è ancora valida (es. non scaduta)
+          const loginTime = new Date(data.loginTime);
+          const now = new Date();
+          const hoursSinceLogin = (now - loginTime) / (1000 * 60 * 60);
+          
+          if (hoursSinceLogin < 8) { // Sessione valida per 8 ore
+            setAdminData(data);
+            setIsAuthenticated(true);
+          } else {
+            localStorage.removeItem('admin_session');
+          }
+        }
+      } catch (error) {
+        console.error('Errore nel controllo autenticazione:', error);
+        localStorage.removeItem('admin_session');
+      }
+      setIsLoading(false);
+    };
+
+    checkAuthStatus();
+  }, []);
+
+  const handleLogin = (adminData) => {
+    setAdminData(adminData);
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('admin_session');
+    setAdminData(null);
+    setIsAuthenticated(false);
+    router.push('/'); // Redirect alla home
+  };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Verifica autenticazione...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Se non autenticato, mostra login
+  if (!isAuthenticated) {
+    return (
+      <>
+        <Head>
+          <title>Admin Login - Best-Trainer</title>
+          <meta name="description" content="Accesso riservato agli amministratori Best-Trainer" />
+          <meta name="robots" content="noindex, nofollow" />
+        </Head>
+        <AdminLogin onLogin={handleLogin} />
+      </>
+    );
+  }
+
+  // Se autenticato, mostra dashboard
+  return (
+    <>
+      <Head>
+        <title>Admin Dashboard - Gestione PT Network | Best-Trainer</title>
+        <meta name="description" content="Dashboard amministrativa per la gestione delle richieste Personal Trainer" />
+        <meta name="robots" content="noindex, nofollow" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        
+        {/* Security Headers per admin */}
+        <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
+        <meta httpEquiv="X-Frame-Options" content="DENY" />
+        <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
+      </Head>
+
+      <div className="min-h-screen bg-gray-50">
+        <AdminHeader adminData={adminData} onLogout={handleLogout} />
+        
+        {/* Success notification per login */}
+        <div className="bg-green-50 border-l-4 border-green-400 p-4">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex items-center">
+              <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
+              <p className="text-green-700 text-sm">
+                <strong>Accesso effettuato con successo!</strong> Benvenuto nella dashboard admin, {adminData.username}.
+                <span className="ml-2 text-xs">
+                  Login: {new Date(adminData.loginTime).toLocaleString('it-IT')}
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Permission notice per ruoli limitati */}
+        {adminData.permissions !== 'full' && (
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="flex items-center">
+                <AlertTriangle className="w-5 h-5 text-yellow-600 mr-3" />
+                <p className="text-yellow-700 text-sm">
+                  <strong>Accesso limitato:</strong> Il tuo ruolo ({adminData.role}) ha permessi limitati. 
+                  Alcune funzionalità potrebbero non essere disponibili.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Dashboard Component */}
+        <AdminDashboard adminData={adminData} />
+
+        {/* Footer admin */}
+        <footer className="bg-white border-t border-gray-200 py-6">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex items-center justify-between text-sm text-gray-500">
+              <div>
+                © 2024 Best-Trainer Admin Panel. Sistema sicuro protetto.
+              </div>
+              <div className="flex items-center space-x-4">
+                <span>Sessione attiva: {adminData.username}</span>
+                <span>•</span>
+                <span>Ultima attività: {new Date().toLocaleTimeString('it-IT')}</span>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </>
   );
 }
