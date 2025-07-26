@@ -18,12 +18,16 @@ import {
   Facebook,
   Instagram,
   Youtube,
-  Mail
+  Mail,
+  ChevronDown,
+  User,
+  UserPlus
 } from 'lucide-react';
 
 export default function BestTrainerMVP() {
   const [activeFilter, setActiveFilter] = useState('tutti');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const filtriCategorie = [
     { id: 'tutti', label: 'Tutti i Programmi', emoji: '🏆' },
@@ -186,11 +190,11 @@ export default function BestTrainerMVP() {
                 <Link href="/programmi" className="hover:text-blue-400 transition-colors">
                   Programmi
                 </Link>
-                <Link href="/personal-trainer" className="hover:text-blue-400 transition-colors">
-                  Personal Trainer
+                <Link href="/professionisti" className="hover:text-blue-400 transition-colors">
+                  Professionisti
                 </Link>
-                <Link href="/video-library" className="hover:text-blue-400 transition-colors">
-                  Video Gratuiti
+                <Link href="/tutorial-esercizi" className="hover:text-blue-400 transition-colors">
+                  Tutorial Esercizi
                 </Link>
               </nav>
             </div>
@@ -201,12 +205,45 @@ export default function BestTrainerMVP() {
               >
                 Accedi
               </Link>
-              <Link 
-                href="/auth/pt-network"
-                className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors"
-              >
-                PT Network
-              </Link>
+              
+              {/* PT Network Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors flex items-center"
+                >
+                  PT Network
+                  <ChevronDown className={`w-4 h-4 ml-2 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <User className="w-4 h-4 mr-3 text-blue-600" />
+                      <div>
+                        <div className="font-medium">Dashboard PT</div>
+                        <div className="text-sm text-gray-500">Accesso con codice</div>
+                      </div>
+                    </Link>
+                    <div className="border-t border-gray-100"></div>
+                    <Link
+                      href="/auth/pt-application"
+                      className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <UserPlus className="w-4 h-4 mr-3 text-green-600" />
+                      <div>
+                        <div className="font-medium">Richiedi Accesso</div>
+                        <div className="text-sm text-gray-500">Unisciti alla community</div>
+                      </div>
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -240,11 +277,11 @@ export default function BestTrainerMVP() {
               Cerca Programmi
             </Link>
             <Link
-              href="/video-library"
+              href="/tutorial-esercizi"
               className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center"
             >
               <Play className="w-5 h-5 mr-2" />
-              Video Gratuiti
+              Tutorial Gratuiti
             </Link>
           </div>
 
@@ -607,7 +644,7 @@ export default function BestTrainerMVP() {
               <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
             <Link
-              href="/video-library"
+              href="/tutorial-esercizi"
               className="border-2 border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 rounded-lg font-semibold transition-colors flex items-center"
             >
               <Play className="w-5 h-5 mr-2" />
@@ -644,11 +681,11 @@ export default function BestTrainerMVP() {
             </div>
 
             <div>
-              <h4 className="text-lg font-semibold mb-4">Personal Trainer</h4>
+              <h4 className="text-lg font-semibold mb-4">Professionisti</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="/auth/pt-network" className="hover:text-white transition-colors">PT Network</Link></li>
-                <li><Link href="/personal-trainer" className="hover:text-white transition-colors">Trova Trainer</Link></li>
+                <li><Link href="/professionisti" className="hover:text-white transition-colors">Trova Trainer</Link></li>
                 <li><Link href="/dashboard" className="hover:text-white transition-colors">Dashboard PT</Link></li>
+                <li><Link href="/auth/pt-application" className="hover:text-white transition-colors">Richiedi Accesso</Link></li>
               </ul>
             </div>
 
