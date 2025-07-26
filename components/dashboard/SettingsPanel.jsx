@@ -318,6 +318,9 @@ export default function SettingsPanel() {
     );
   };
 
+  // Debug per verificare activeSection
+  console.log('Active Section:', activeSection);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto p-6">
@@ -355,7 +358,10 @@ export default function SettingsPanel() {
                   return (
                     <button
                       key={section.id}
-                      onClick={() => setActiveSection(section.id)}
+                      onClick={() => {
+                        console.log('Clicked section:', section.id); // Debug click
+                        setActiveSection(section.id);
+                      }}
                       className={`w-full flex items-center px-3 py-3 rounded-lg transition-colors text-left ${
                         activeSection === section.id
                           ? `${colors[section.color]} font-medium`
@@ -373,6 +379,11 @@ export default function SettingsPanel() {
 
           {/* Main Content */}
           <div className="flex-1">
+            {/* Debug indicator */}
+            <div className="mb-4 p-2 bg-blue-50 rounded text-sm text-blue-700">
+              Sezione attiva: {activeSection}
+            </div>
+
             {/* Account Settings */}
             {activeSection === 'account' && (
               <div className="space-y-6">
