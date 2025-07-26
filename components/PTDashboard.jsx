@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   User, 
@@ -42,22 +42,25 @@ export default function PTDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedContent, setGeneratedContent] = useState('');
+  const [saveStatus, setSaveStatus] = useState(''); // 'saving', 'saved', 'error'
+  const [lastSaved, setLastSaved] = useState(null);
   
+  // Dati profilo con valori di default
   const [profileData, setProfileData] = useState({
-    nome: 'Marco Rossi',
+    nome: '',
     cognome: '',
-    email: 'marco.rossi@email.com',
-    telefono: '+39 123 456 7890',
-    citta: 'Milano',
-    bio: 'Personal Trainer specializzato in bodybuilding e powerlifting con 8 anni di esperienza. Appassionato di trasformazioni fisiche e crescita personale.',
-    specializzazioni: ['Bodybuilding', 'Powerlifting', 'Dimagrimento'],
-    anniEsperienza: 8,
-    certificazioni: ['NASM-CPT', 'FIPE'],
+    email: '',
+    telefono: '',
+    citta: '',
+    bio: '',
+    specializzazioni: [],
+    anniEsperienza: 0,
+    certificazioni: [],
     fotoProfile: null,
-    instagram: '@marcorossifitness',
-    facebook: 'MarcoRossiFitness',
-    youtube: 'MarcoRossiPT',
-    sitoWeb: 'www.marcorossifitness.com'
+    instagram: '',
+    facebook: '',
+    youtube: '',
+    sitoWeb: ''
   });
 
   const [programmi, setProgrammi] = useState([
@@ -105,6 +108,7 @@ export default function PTDashboard() {
   const [showNewProgramForm, setShowNewProgramForm] = useState(false);
   const [aiContentType, setAiContentType] = useState('');
   const [showAiModal, setShowAiModal] = useState(false);
+  const [profileErrors, setProfileErrors] = useState({});
 
   const categorie = [
     'Massa Muscolare', 'Dimagrimento', 'Forza & Potenza', 'Cardio & Resistenza',
@@ -118,6 +122,242 @@ export default function PTDashboard() {
     'Dimagrimento', 'Tonificazione', 'Yoga', 'Pilates', 'Cardio',
     'Preparazione Atletica', 'Riabilitazione', 'Posturale'
   ];
+
+  // Carica dati dal localStorage all'avvio
+  useEffect(() => {
+    const savedProfile = localStorage.getItem('bt_profile_data');
+    if (savedProfile) {
+      try {
+        const parsedProfile = JSON.parse(savedProfile);
+        setProfileData(parsedProfile);
+        console.log('Profilo caricato dal localStorage');
+      } catch (error) {
+        console.error('Errore nel caricamento del profilo:', error);
+      }
+    }
+  }, []);
+
+  // Funzione per salvare nel localStorage
+  const saveToLocalStorage = (data) => {
+    try {
+      localStorage.setItem('bt_profile_data', JSON.stringify(data));
+      setSaveStatus('saved');
+      setLastSaved(new Date());
+      
+      // Reset save status dopo 3 secondi
+      setTimeout(() => {
+        setSaveStatus('');
+      }, 3000);
+      
+      console.log('Profilo salvato nel localStorage');
+    } catch (error) {
+      console.error('Errore nel salvataggio:', error);
+      setSaveStatus('error');
+      setTimeout(() => {
+        setSaveStatus('');
+      }, 3000);
+    }
+  };
+
+  // Validazione campi
+  const validateField = (field, value) => {
+    const errors = { ...profileErrors };
+    
+    switch (field) {
+      case 'email':
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (value && !emailRegex.test(value)) {
+          errors.email = 'Email non valida';
+        } else {
+          delete errors.email;
+        }
+        break;
+      case 'telefono':
+        const phoneRegex = /^[\+]?[\d\s\-\(\)]+$/;
+        if (value && !phoneRegex.test(value)) {
+          errors.telefono = 'Numero di telefono non valido';
+        } else {
+          delete errors.telefono;
+        }
+        break;
+      case 'nome':
+        if (!value || value.trim().length < 2) {
+          errors.nome = 'Nome richiesto (min 2 caratteri)';
+        } else {
+          delete errors.nome;
+        }
+        break;
+      case 'anniEsperienza':
+        if (value < 0 || value > 50) {
+          errors.anniEsperienza = 'Anni esperienza non validi';
+        } else {
+          delete errors.anniEsperienza;
+        }
+        break;
+    }
+    
+    setProfileErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Aggiorna profilo con auto-save
+  const handleProfileUpdate = (field, value) => {
+    setSaveStatus('saving');
+    
+    // Valida il campo
+    validateField(field, value);
+    
+    const updatedProfile = {
+      ...profileData,
+      [field]: value
+    };
+    
+    setProfileData(updatedProfile);
+    
+    // Auto-save con debounce
+    setTimeout(() => {
+      saveToLocalStorage(updatedProfile);
+    }, 500);
+  };
+
+  // Gestione specializzazioni
+  const handleSpecializzazioniChange = (specializzazione) => {
+    setSaveStatus('saving');
+    
+    const updatedSpecializzazioni = profileData.specializzazioni.includes(specializzazione)
+      ? profileData.specializzazioni.filter(s => s !== specializzazione)
+      : [...profileData.specializzazioni, specializzazione];
+    
+    const updatedProfile = {
+      ...profileData,
+      specializzazioni: updatedSpecializzazioni
+    };
+    
+    setProfileData(updatedProfile);
+    saveToLocalStorage(updatedProfile);
+  };
+
+  // Gestione certificazioni
+  const handleCertificazioniChange = (index, value) => {
+    setSaveStatus('saving');
+    
+    const updatedCertificazioni = [...profileData.certificazioni];
+    if (value) {
+      updatedCertificazioni[index] = value;
+    } else {
+      updatedCertificazioni.splice(index, 1);
+    }
+    
+    const updatedProfile = {
+      ...profileData,
+      certificazioni: updatedCertificazioni.filter(cert => cert.trim())
+    };
+    
+    setProfileData(updatedProfile);
+    saveToLocalStorage(updatedProfile);
+  };
+
+  const addCertificazione = () => {
+    const updatedProfile = {
+      ...profileData,
+      certificazioni: [...profileData.certificazioni, '']
+    };
+    setProfileData(updatedProfile);
+  };
+
+  // Gestione upload foto
+  const handleFileUpload = (type, file) => {
+    if (type === 'profile' && file) {
+      setSaveStatus('saving');
+      
+      // Validazione file
+      if (!file.type.startsWith('image/')) {
+        alert('Seleziona solo file immagine');
+        return;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) { // 5MB
+        alert('File troppo grande. Max 5MB');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const updatedProfile = {
+          ...profileData,
+          fotoProfile: e.target.result // Base64 string
+        };
+        setProfileData(updatedProfile);
+        saveToLocalStorage(updatedProfile);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Salvataggio manuale completo
+  const handleSaveProfile = () => {
+    setSaveStatus('saving');
+    
+    // Validazione completa
+    const isValid = ['nome', 'email', 'telefono', 'anniEsperienza'].every(field => 
+      validateField(field, profileData[field])
+    );
+    
+    if (!isValid) {
+      setSaveStatus('error');
+      alert('Correggi gli errori evidenziati prima di salvare');
+      return;
+    }
+    
+    saveToLocalStorage(profileData);
+    alert('Profilo salvato con successo!');
+  };
+
+  // Reset profilo
+  const handleResetProfile = () => {
+    if (confirm('Sei sicuro di voler resettare tutti i dati del profilo?')) {
+      const emptyProfile = {
+        nome: '', cognome: '', email: '', telefono: '', citta: '', bio: '',
+        specializzazioni: [], anniEsperienza: 0, certificazioni: [],
+        fotoProfile: null, instagram: '', facebook: '', youtube: '', sitoWeb: ''
+      };
+      setProfileData(emptyProfile);
+      setProfileErrors({});
+      localStorage.removeItem('bt_profile_data');
+      setSaveStatus('');
+    }
+  };
+
+  // Save Status Component
+  const SaveStatusIndicator = () => {
+    if (!saveStatus) return null;
+    
+    return (
+      <div className={`flex items-center space-x-2 text-sm ${
+        saveStatus === 'saved' ? 'text-green-600' : 
+        saveStatus === 'saving' ? 'text-blue-600' : 'text-red-600'
+      }`}>
+        {saveStatus === 'saving' && (
+          <>
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+            <span>Salvando...</span>
+          </>
+        )}
+        {saveStatus === 'saved' && (
+          <>
+            <CheckCircle className="w-4 h-4" />
+            <span>Salvato {lastSaved && `alle ${lastSaved.toLocaleTimeString()}`}</span>
+          </>
+        )}
+        {saveStatus === 'error' && (
+          <>
+            <AlertCircle className="w-4 h-4" />
+            <span>Errore nel salvataggio</span>
+          </>
+        )}
+      </div>
+    );
+  };
 
   // Simulazione chiamata AI API
   const generateAIContent = async (type, context = {}) => {
@@ -239,33 +479,10 @@ ${context.titolo || 'Il programma che cambierà il tuo fisico'}
     if (aiContentType === 'program-description' && showNewProgramForm) {
       setNuovoProgramma(prev => ({ ...prev, descrizione: generatedContent }));
     } else if (aiContentType === 'bio-professional') {
-      setProfileData(prev => ({ ...prev, bio: generatedContent }));
+      handleProfileUpdate('bio', generatedContent);
     }
     setShowAiModal(false);
     alert('Contenuto applicato con successo!');
-  };
-
-  const handleProfileUpdate = (field, value) => {
-    setProfileData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleSpecializzazioniChange = (specializzazione) => {
-    setProfileData(prev => ({
-      ...prev,
-      specializzazioni: prev.specializzazioni.includes(specializzazione)
-        ? prev.specializzazioni.filter(s => s !== specializzazione)
-        : [...prev.specializzazioni, specializzazione]
-    }));
-  };
-
-  const handleFileUpload = (type, file) => {
-    if (type === 'profile') {
-      setProfileData(prev => ({ ...prev, fotoProfile: file }));
-    }
-    console.log(`Upload ${type}:`, file);
   };
 
   const handleNewProgramChange = (field, value) => {
@@ -336,6 +553,7 @@ ${context.titolo || 'Il programma che cambierà il tuo fisico'}
               </Link>
               <span className="text-gray-400">|</span>
               <h1 className="text-xl font-semibold text-gray-700">Dashboard</h1>
+              <SaveStatusIndicator />
             </div>
             <div className="flex items-center space-x-4">
               <Link href="/" className="text-gray-600 hover:text-blue-600 transition-colors">
@@ -356,14 +574,14 @@ ${context.titolo || 'Il programma che cambierà il tuo fisico'}
           <div className="lg:w-64 flex-shrink-0">
             <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="text-center mb-6">
-                <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 relative">
                   {profileData.fotoProfile ? (
-                    <img src={URL.createObjectURL(profileData.fotoProfile)} className="w-full h-full rounded-full object-cover" />
+                    <img src={profileData.fotoProfile} className="w-full h-full rounded-full object-cover" alt="Profile" />
                   ) : (
                     <User className="w-10 h-10 text-blue-600" />
                   )}
                 </div>
-                <h3 className="font-semibold text-gray-900">{profileData.nome}</h3>
+                <h3 className="font-semibold text-gray-900">{profileData.nome || 'Profilo non completato'}</h3>
                 <p className="text-sm text-gray-500">Personal Trainer</p>
               </div>
 
@@ -443,6 +661,27 @@ ${context.titolo || 'Il programma che cambierà il tuo fisico'}
                     </div>
                   </div>
 
+                  {/* Profile Completion Alert */}
+                  {(!profileData.nome || !profileData.email || profileData.specializzazioni.length === 0) && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-8">
+                      <div className="flex items-start">
+                        <AlertCircle className="w-6 h-6 text-yellow-600 mr-3 mt-0.5" />
+                        <div>
+                          <h3 className="text-lg font-semibold text-yellow-800 mb-2">Completa il tuo profilo</h3>
+                          <p className="text-yellow-700 mb-4">
+                            Un profilo completo aumenta la fiducia dei clienti e migliora le vendite.
+                          </p>
+                          <button
+                            onClick={() => setActiveTab('profile')}
+                            className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-colors"
+                          >
+                            Completa Profilo
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   {/* AI Quick Actions */}
                   <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-6 mb-8">
                     <div className="flex items-center justify-between">
@@ -488,183 +727,167 @@ ${context.titolo || 'Il programma che cambierà il tuo fisico'}
               </div>
             )}
 
-            {/* AI Assistant Tab */}
-            {activeTab === 'ai-assistant' && (
-              <div className="space-y-8">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-gray-900 flex items-center">
-                    <Bot className="w-8 h-8 mr-3 text-blue-600" />
-                    AI Content Assistant
-                  </h2>
-                  <div className="flex items-center text-sm text-gray-500">
-                    <Zap className="w-4 h-4 mr-1" />
-                    Powered by AI
-                  </div>
-                </div>
-
-                {/* AI Tools Grid */}
-                <div className="grid md:grid-cols-2 gap-6">
-                  {/* Program Description Generator */}
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <div className="flex items-center mb-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-                        <FileText className="w-6 h-6 text-blue-600" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900">Descrizioni Programmi</h3>
-                        <p className="text-sm text-gray-600">Genera descrizioni accattivanti</p>
-                      </div>
-                    </div>
-                    <p className="text-gray-600 mb-4">
-                      Crea descrizioni professionali che convertono visitatori in clienti
-                    </p>
-                    <button
-                      onClick={() => handleAIGenerate('program-description', {
-                        categoria: 'Massa Muscolare',
-                        livello: 'Avanzato',
-                        durata: '12 settimane'
-                      })}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-colors flex items-center justify-center"
-                    >
-                      <Wand2 className="w-4 h-4 mr-2" />
-                      Genera Descrizione
-                    </button>
-                  </div>
-
-                  {/* Bio Professional Generator */}
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <div className="flex items-center mb-4">
-                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
-                        <User className="w-6 h-6 text-green-600" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900">Bio Professionale</h3>
-                        <p className="text-sm text-gray-600">Ottimizza il tuo profilo</p>
-                      </div>
-                    </div>
-                    <p className="text-gray-600 mb-4">
-                      Bio professionale che trasmette autorevolezza e competenza
-                    </p>
-                    <button
-                      onClick={() => handleAIGenerate('bio-professional')}
-                      className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg transition-colors flex items-center justify-center"
-                    >
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Ottimizza Bio
-                    </button>
-                  </div>
-
-                  {/* Title Generator */}
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <div className="flex items-center mb-4">
-                      <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
-                        <Target className="w-6 h-6 text-purple-600" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900">Titoli Accattivanti</h3>
-                        <p className="text-sm text-gray-600">Titoli che vendono</p>
-                      </div>
-                    </div>
-                    <p className="text-gray-600 mb-4">
-                      Genera titoli irresistibili per i tuoi programmi
-                    </p>
-                    <button
-                      onClick={() => handleAIGenerate('program-titles', {
-                        categoria: 'Massa Muscolare',
-                        durata: '12 settimane'
-                      })}
-                      className="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-lg transition-colors flex items-center justify-center"
-                    >
-                      <Zap className="w-4 h-4 mr-2" />
-                      Genera Titoli
-                    </button>
-                  </div>
-
-                  {/* Social Media Posts */}
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <div className="flex items-center mb-4">
-                      <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mr-4">
-                        <Instagram className="w-6 h-6 text-pink-600" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900">Post Social</h3>
-                        <p className="text-sm text-gray-600">Content per Instagram</p>
-                      </div>
-                    </div>
-                    <p className="text-gray-600 mb-4">
-                      Post Instagram pronti per promuovere i tuoi programmi
-                    </p>
-                    <button
-                      onClick={() => handleAIGenerate('social-post', {
-                        titolo: 'Massa Muscolare Avanzato',
-                        categoria: 'Massa Muscolare',
-                        durata: '12 settimane',
-                        prezzo: '79.99'
-                      })}
-                      className="w-full bg-pink-600 hover:bg-pink-700 text-white px-4 py-3 rounded-lg transition-colors flex items-center justify-center"
-                    >
-                      <Instagram className="w-4 h-4 mr-2" />
-                      Crea Post
-                    </button>
-                  </div>
-                </div>
-
-                {/* AI Tips */}
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">💡 Consigli AI</h3>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="flex items-start">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-0.5" />
-                      <div>
-                        <p className="font-medium text-gray-900">Personalizza sempre</p>
-                        <p className="text-sm text-gray-600">Modifica i contenuti AI per riflettere il tuo stile</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start">
-                      <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-0.5" />
-                      <div>
-                        <p className="font-medium text-gray-900">Testa e ottimizza</p>
-                        <p className="text-sm text-gray-600">Prova versioni diverse per vedere cosa funziona meglio</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* Profile Tab */}
             {activeTab === 'profile' && (
               <div className="space-y-8">
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-bold text-gray-900">Gestione Profilo</h2>
-                  <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center">
-                    <Save className="w-4 h-4 mr-2" />
-                    Salva Modifiche
-                  </button>
+                  <div className="flex items-center space-x-4">
+                    <button 
+                      onClick={handleResetProfile}
+                      className="text-red-600 hover:text-red-700 px-4 py-2 border border-red-600 rounded-lg transition-colors"
+                    >
+                      Reset
+                    </button>
+                    <button 
+                      onClick={handleSaveProfile}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center"
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      Salva Tutto
+                    </button>
+                  </div>
                 </div>
 
+                {/* Foto Profilo */}
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6">Foto Profilo</h3>
+                  <div className="flex items-center space-x-6">
+                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center relative">
+                      {profileData.fotoProfile ? (
+                        <img src={profileData.fotoProfile} className="w-full h-full rounded-full object-cover" alt="Profile" />
+                      ) : (
+                        <User className="w-12 h-12 text-gray-400" />
+                      )}
+                      <label className="absolute -bottom-2 -right-2 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full cursor-pointer transition-colors">
+                        <Camera className="w-4 h-4" />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleFileUpload('profile', e.target.files[0])}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-2">Carica una foto professionale</h4>
+                      <p className="text-sm text-gray-600 mb-4">
+                        Una foto di qualità aumenta la fiducia dei clienti. Formati supportati: JPG, PNG (max 5MB)
+                      </p>
+                      {profileData.fotoProfile && (
+                        <button
+                          onClick={() => handleProfileUpdate('fotoProfile', null)}
+                          className="text-red-600 hover:text-red-700 text-sm"
+                        >
+                          Rimuovi foto
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Informazioni Personali */}
                 <div className="bg-white rounded-xl shadow-sm p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-6">Informazioni Personali</h3>
                   
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Nome</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Nome *
+                        </label>
                         <input
                           type="text"
                           value={profileData.nome}
                           onChange={(e) => handleProfileUpdate('nome', e.target.value)}
+                          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                            profileErrors.nome ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          placeholder="Il tuo nome"
+                        />
+                        {profileErrors.nome && (
+                          <p className="text-red-500 text-xs mt-1">{profileErrors.nome}</p>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Cognome</label>
+                        <input
+                          type="text"
+                          value={profileData.cognome}
+                          onChange={(e) => handleProfileUpdate('cognome', e.target.value)}
                           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Il tuo cognome"
                         />
                       </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Email *
+                        </label>
                         <input
                           type="email"
                           value={profileData.email}
                           onChange={(e) => handleProfileUpdate('email', e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                            profileErrors.email ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          placeholder="la-tua-email@esempio.com"
                         />
+                        {profileErrors.email && (
+                          <p className="text-red-500 text-xs mt-1">{profileErrors.email}</p>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Telefono</label>
+                        <input
+                          type="tel"
+                          value={profileData.telefono}
+                          onChange={(e) => handleProfileUpdate('telefono', e.target.value)}
+                          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                            profileErrors.telefono ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          placeholder="+39 123 456 7890"
+                        />
+                        {profileErrors.telefono && (
+                          <p className="text-red-500 text-xs mt-1">{profileErrors.telefono}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Città</label>
+                        <input
+                          type="text"
+                          value={profileData.citta}
+                          onChange={(e) => handleProfileUpdate('citta', e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Milano, Roma, ecc."
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Anni di Esperienza
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="50"
+                          value={profileData.anniEsperienza}
+                          onChange={(e) => handleProfileUpdate('anniEsperienza', parseInt(e.target.value) || 0)}
+                          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                            profileErrors.anniEsperienza ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          placeholder="5"
+                        />
+                        {profileErrors.anniEsperienza && (
+                          <p className="text-red-500 text-xs mt-1">{profileErrors.anniEsperienza}</p>
+                        )}
                       </div>
                     </div>
 
@@ -684,228 +907,154 @@ ${context.titolo || 'Il programma che cambierà il tuo fisico'}
                         onChange={(e) => handleProfileUpdate('bio', e.target.value)}
                         rows={4}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Racconta la tua esperienza e specializzazioni..."
+                        placeholder="Racconta la tua esperienza, approccio e filosofia di allenamento..."
                       />
+                      <p className="text-xs text-gray-500 mt-1">
+                        {profileData.bio.length}/500 caratteri
+                      </p>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
 
-            {/* Programs Tab */}
-            {activeTab === 'programs' && (
-              <div className="space-y-8">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-gray-900">Gestione Programmi</h2>
-                  <button
-                    onClick={() => setShowNewProgramForm(true)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Nuovo Programma
-                  </button>
-                </div>
-
-                {/* Form Nuovo Programma */}
-                {showNewProgramForm && (
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-lg font-semibold text-gray-900">Nuovo Programma</h3>
-                      <button
-                        onClick={() => setShowNewProgramForm(false)}
-                        className="text-gray-400 hover:text-gray-600"
-                      >
-                        ×
-                      </button>
-                    </div>
-
-                    <form onSubmit={handleNewProgramSubmit} className="space-y-6">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Titolo Programma</label>
+                {/* Specializzazioni */}
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6">Specializzazioni</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {specializzazioniDisponibili.map((spec) => (
+                      <label key={spec} className="flex items-center space-x-3 cursor-pointer">
                         <input
-                          type="text"
-                          value={nuovoProgramma.titolo}
-                          onChange={(e) => handleNewProgramChange('titolo', e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="Es: Massa Muscolare Avanzato"
-                          required
+                          type="checkbox"
+                          checked={profileData.specializzazioni.includes(spec)}
+                          onChange={() => handleSpecializzazioniChange(spec)}
+                          className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                         />
-                      </div>
-
-                      <div>
-                        <div className="flex items-center justify-between mb-2">
-                          <label className="block text-sm font-medium text-gray-700">Descrizione</label>
-                          <button
-                            type="button"
-                            onClick={() => handleAIGenerate('program-description', {
-                              categoria: nuovoProgramma.categoria,
-                              livello: nuovoProgramma.livello,
-                              durata: nuovoProgramma.durata
-                            })}
-                            className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full hover:bg-blue-200 transition-colors flex items-center"
-                          >
-                            <Bot className="w-3 h-3 mr-1" />
-                            AI
-                          </button>
-                        </div>
-                        <textarea
-                          value={nuovoProgramma.descrizione}
-                          onChange={(e) => handleNewProgramChange('descrizione', e.target.value)}
-                          rows={4}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="Descrivi il programma, gli obiettivi e cosa include..."
-                          required
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Prezzo (€)</label>
-                          <input
-                            type="number"
-                            step="0.01"
-                            value={nuovoProgramma.prezzo}
-                            onChange={(e) => handleNewProgramChange('prezzo', e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="29.99"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
-                          <select
-                            value={nuovoProgramma.categoria}
-                            onChange={(e) => handleNewProgramChange('categoria', e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            required
-                          >
-                            <option value="">Seleziona categoria</option>
-                            {categorie.map(cat => (
-                              <option key={cat} value={cat}>{cat}</option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-end space-x-4">
-                        <button
-                          type="button"
-                          onClick={() => setShowNewProgramForm(false)}
-                          className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                        >
-                          Annulla
-                        </button>
-                        <button
-                          type="submit"
-                          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-                        >
-                          <Save className="w-4 h-4 mr-2" />
-                          Salva Programma
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                )}
-
-                {/* Lista Programmi */}
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-                  <div className="px-6 py-4 border-b border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900">I Tuoi Programmi</h3>
-                  </div>
-                  
-                  <div className="divide-y divide-gray-200">
-                    {programmi.map((programma) => (
-                      <div key={programma.id} className="p-6">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-3 mb-2">
-                              <h4 className="text-lg font-semibold text-gray-900">{programma.titolo}</h4>
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                programma.pubblicato 
-                                  ? 'bg-green-100 text-green-800' 
-                                  : 'bg-yellow-100 text-yellow-800'
-                              }`}>
-                                {programma.pubblicato ? 'Pubblicato' : 'Bozza'}
-                              </span>
-                            </div>
-                            
-                            <p className="text-gray-600 mb-4">{programma.descrizione}</p>
-                            
-                            <div className="flex items-center space-x-6 text-sm text-gray-500">
-                              <span>€{programma.prezzo}</span>
-                              <span>{programma.vendite} vendite</span>
-                              {programma.rating > 0 && (
-                                <span className="flex items-center">
-                                  <Star className="w-4 h-4 mr-1 text-yellow-400" />
-                                  {programma.rating}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="flex items-center space-x-2 ml-6">
-                            <button
-                              onClick={() => handleAIGenerate('social-post', {
-                                titolo: programma.titolo,
-                                categoria: programma.categoria,
-                                durata: programma.durata,
-                                prezzo: programma.prezzo
-                              })}
-                              className="p-2 text-gray-400 hover:text-purple-600 transition-colors"
-                              title="Genera post social"
-                            >
-                              <Bot className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => togglePubblicazione(programma.id)}
-                              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                                programma.pubblicato
-                                  ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
-                                  : 'bg-green-100 text-green-800 hover:bg-green-200'
-                              }`}
-                            >
-                              {programma.pubblicato ? 'Nascondi' : 'Pubblica'}
-                            </button>
-                            <button 
-                              onClick={() => handleDeleteProgram(programma.id)}
-                              className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
+                        <span className="text-sm text-gray-700">{spec}</span>
+                      </label>
                     ))}
                   </div>
+                  {profileData.specializzazioni.length > 0 && (
+                    <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                      <p className="text-sm text-blue-700">
+                        <strong>Selezionate:</strong> {profileData.specializzazioni.join(', ')}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Certificazioni */}
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6">Certificazioni</h3>
+                  <div className="space-y-3">
+                    {profileData.certificazioni.map((cert, index) => (
+                      <div key={index} className="flex items-center space-x-3">
+                        <input
+                          type="text"
+                          value={cert}
+                          onChange={(e) => handleCertificazioniChange(index, e.target.value)}
+                          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Es: NASM-CPT, CONI, FIPE..."
+                        />
+                        <button
+                          onClick={() => handleCertificazioniChange(index, '')}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      onClick={addCertificazione}
+                      className="text-blue-600 hover:text-blue-700 text-sm flex items-center"
+                    >
+                      <Plus className="w-4 h-4 mr-1" />
+                      Aggiungi Certificazione
+                    </button>
+                  </div>
+                </div>
+
+                {/* Social Media */}
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6">Social Media & Contatti</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Instagram</label>
+                      <div className="relative">
+                        <Instagram className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                          type="text"
+                          value={profileData.instagram}
+                          onChange={(e) => handleProfileUpdate('instagram', e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="@tuousername"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Facebook</label>
+                      <div className="relative">
+                        <Facebook className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                          type="text"
+                          value={profileData.facebook}
+                          onChange={(e) => handleProfileUpdate('facebook', e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Il tuo profilo Facebook"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">YouTube</label>
+                      <div className="relative">
+                        <Youtube className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                          type="text"
+                          value={profileData.youtube}
+                          onChange={(e) => handleProfileUpdate('youtube', e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Il tuo canale YouTube"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Sito Web</label>
+                      <div className="relative">
+                        <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                          type="url"
+                          value={profileData.sitoWeb}
+                          onChange={(e) => handleProfileUpdate('sitoWeb', e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="https://tuosito.com"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Settings Tab */}
+            {/* Altri tab rimangono invariati */}
+            {activeTab === 'ai-assistant' && (
+              <div className="bg-white rounded-xl shadow-sm p-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">AI Assistant</h2>
+                <p className="text-gray-600">Funzionalità AI in sviluppo...</p>
+              </div>
+            )}
+
+            {activeTab === 'programs' && (
+              <div className="bg-white rounded-xl shadow-sm p-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Gestione Programmi</h2>
+                <p className="text-gray-600">Gestione programmi in sviluppo...</p>
+              </div>
+            )}
+
             {activeTab === 'settings' && (
-              <div className="space-y-8">
-                <h2 className="text-2xl font-bold text-gray-900">Impostazioni</h2>
-                
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Impostazioni Account</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                      <div>
-                        <h4 className="font-medium text-gray-900">Notifiche Email</h4>
-                        <p className="text-sm text-gray-600">Ricevi notifiche per nuove vendite e messaggi</p>
-                      </div>
-                      <input type="checkbox" defaultChecked className="w-4 h-4 text-blue-600" />
-                    </div>
-                    
-                    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                      <div>
-                        <h4 className="font-medium text-gray-900">AI Assistant</h4>
-                        <p className="text-sm text-gray-600">Attiva i suggerimenti AI per migliorare i contenuti</p>
-                      </div>
-                      <input type="checkbox" defaultChecked className="w-4 h-4 text-blue-600" />
-                    </div>
-                  </div>
-                </div>
+              <div className="bg-white rounded-xl shadow-sm p-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Impostazioni</h2>
+                <p className="text-gray-600">Impostazioni in sviluppo...</p>
               </div>
             )}
           </div>
