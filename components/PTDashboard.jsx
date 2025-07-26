@@ -21,8 +21,6 @@ import {
   TrendingUp
 } from 'lucide-react';
 
-// Componenti modulari integrati inline per compatibilità ambiente
-
 export default function PTDashboard() {
   const [activeView, setActiveView] = useState('overview');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -34,10 +32,15 @@ export default function PTDashboard() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const savedProfile = localStorage.getItem('bt_profile_data');
-        if (savedProfile) {
-          setProfileData(JSON.parse(savedProfile));
-        }
+        // Simula caricamento dati (non usando localStorage)
+        const mockData = {
+          nome: 'Mario Rossi',
+          email: 'mario@example.com',
+          telefono: '+39 123 456 789',
+          bio: 'Personal trainer esperto con 10 anni di esperienza',
+          citta: 'Milano'
+        };
+        setProfileData(mockData);
       } catch (error) {
         console.error('Errore caricamento dati:', error);
       } finally {
@@ -95,7 +98,7 @@ export default function PTDashboard() {
     const hasPhoto = profileData.fotoProfile ? 1 : 0;
     
     const totalCompleted = completed + (hasSpecializations ? 1 : 0) + hasPhoto;
-    const totalRequired = requiredFields.length + 2; // +2 for specializations and photo
+    const totalRequired = requiredFields.length + 2;
     
     return Math.round((totalCompleted / totalRequired) * 100);
   };
@@ -106,22 +109,35 @@ export default function PTDashboard() {
     return currentItem ? currentItem.label : 'Dashboard';
   };
 
-  // Render current component/view
-  const renderCurrentComponent = () => {
-    switch(activeView) {
-      case 'overview':
-        return <DashboardOverviewView />;
-      case 'ai-assistant':
-        return <AIAssistantView />;
-      case 'profile':
-        return <ProfileManagementView />;
-      case 'programs':
-        return <ProgramsManagementView />;
-      case 'settings':
-        return <SettingsView />;
-      default:
-        return <DashboardOverviewView />;
-    }
+  // Save status indicator
+  const SaveStatusIndicator = () => {
+    if (!saveStatus) return null;
+    
+    return (
+      <div className={`flex items-center space-x-2 text-sm ${
+        saveStatus === 'saved' ? 'text-green-600' : 
+        saveStatus === 'saving' ? 'text-blue-600' : 'text-red-600'
+      }`}>
+        {saveStatus === 'saving' && (
+          <>
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+            <span>Salvando...</span>
+          </>
+        )}
+        {saveStatus === 'saved' && (
+          <>
+            <CheckCircle className="w-4 h-4" />
+            <span>Salvato</span>
+          </>
+        )}
+        {saveStatus === 'error' && (
+          <>
+            <AlertCircle className="w-4 h-4" />
+            <span>Errore</span>
+          </>
+        )}
+      </div>
+    );
   };
 
   // Dashboard Overview Component
@@ -368,6 +384,7 @@ export default function PTDashboard() {
               value={profileData.nome || ''}
               placeholder="Il tuo nome"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              readOnly
             />
           </div>
           <div>
@@ -377,6 +394,7 @@ export default function PTDashboard() {
               value={profileData.email || ''}
               placeholder="la-tua-email@esempio.com"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              readOnly
             />
           </div>
           <div>
@@ -386,6 +404,7 @@ export default function PTDashboard() {
               value={profileData.telefono || ''}
               placeholder="+39 123 456 7890"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              readOnly
             />
           </div>
           <div>
@@ -395,6 +414,7 @@ export default function PTDashboard() {
               value={profileData.citta || ''}
               placeholder="Milano, Roma, ecc."
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              readOnly
             />
           </div>
         </div>
@@ -406,6 +426,7 @@ export default function PTDashboard() {
             rows={4}
             placeholder="Racconta la tua esperienza, approccio e filosofia di allenamento..."
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            readOnly
           />
         </div>
       </div>
@@ -566,129 +587,73 @@ export default function PTDashboard() {
                     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                   </label>
                 </div>
-
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Nuove Vendite</h4>
-                    <p className="text-sm text-gray-600">Notifiche immediate per nuove vendite</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" defaultChecked className="sr-only peer" />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
-
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Nuove Recensioni</h4>
-                    <p className="text-sm text-gray-600">Avvisi per recensioni sui tuoi programmi</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" defaultChecked className="sr-only peer" />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
               </div>
             </div>
           );
 
-        case 'privacy':
+        default:
           return (
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
-                <CheckCircle className="w-5 h-5 mr-2" />
-                Privacy e Visibilità
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                Sezione in sviluppo
               </h3>
-              
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Profilo Pubblico</h4>
-                    <p className="text-sm text-gray-600">Il tuo profilo è visibile agli utenti</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" defaultChecked className="sr-only peer" />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
-
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Mostra Email</h4>
-                    <p className="text-sm text-gray-600">Email visibile nel profilo pubblico</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
-
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Indicizzazione SEO</h4>
-                    <p className="text-sm text-gray-600">Permetti ai motori di ricerca di indicizzare</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" defaultChecked className="sr-only peer" />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
-              </div>
+              <p className="text-gray-600">Questa sezione sarà disponibile presto.</p>
             </div>
           );
+      }
+    };
 
-        case 'payments':
-          return (
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
-                <Settings className="w-5 h-5 mr-2" />
-                Pagamenti e Fatturazione
-              </h3>
-              
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Metodo di Pagamento</h4>
-                    <p className="text-sm text-gray-600">Nessun metodo configurato</p>
-                  </div>
-                  <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                    Aggiungi
-                  </button>
-                </div>
-                
-                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                  <div>
-                    <h4 className="font-medium text-gray-900">Pre
-
-  // Save status indicator
-  const SaveStatusIndicator = () => {
-    if (!saveStatus) return null;
-    
     return (
-      <div className={`flex items-center space-x-2 text-sm ${
-        saveStatus === 'saved' ? 'text-green-600' : 
-        saveStatus === 'saving' ? 'text-blue-600' : 'text-red-600'
-      }`}>
-        {saveStatus === 'saving' && (
-          <>
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-            <span>Salvando...</span>
-          </>
-        )}
-        {saveStatus === 'saved' && (
-          <>
-            <CheckCircle className="w-4 h-4" />
-            <span>Salvato</span>
-          </>
-        )}
-        {saveStatus === 'error' && (
-          <>
-            <AlertCircle className="w-4 h-4" />
-            <span>Errore</span>
-          </>
-        )}
+      <div className="space-y-8">
+        <h2 className="text-2xl font-bold text-gray-900">Impostazioni</h2>
+        
+        <div className="grid lg:grid-cols-4 gap-6">
+          <div className="bg-white rounded-xl shadow-sm p-4">
+            <nav className="space-y-2">
+              {settingsSections.map((section) => {
+                const Icon = section.icon;
+                return (
+                  <button
+                    key={section.id}
+                    onClick={() => setActiveSettingsSection(section.id)}
+                    className={`w-full flex items-center px-3 py-2 text-sm rounded-lg transition-colors ${
+                      activeSettingsSection === section.id
+                        ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                        : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4 mr-3" />
+                    {section.name}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+
+          <div className="lg:col-span-3">
+            {renderSettingsContent()}
+          </div>
+        </div>
       </div>
     );
+  };
+
+  // Render current component/view
+  const renderCurrentComponent = () => {
+    switch(activeView) {
+      case 'overview':
+        return <DashboardOverviewView />;
+      case 'ai-assistant':
+        return <AIAssistantView />;
+      case 'profile':
+        return <ProfileManagementView />;
+      case 'programs':
+        return <ProgramsManagementView />;
+      case 'settings':
+        return <SettingsView />;
+      default:
+        return <DashboardOverviewView />;
+    }
   };
 
   if (loading) {
@@ -784,52 +749,6 @@ export default function PTDashboard() {
                   </div>
                 )}
               </div>
-
-              {/* Social Links */}
-              {(profileData.instagram || profileData.facebook || profileData.youtube || profileData.sitoWeb) && (
-                <div className="flex justify-center space-x-2 mt-3 pt-3 border-t border-gray-200">
-                  {profileData.instagram && (
-                    <a 
-                      href={`https://instagram.com/${profileData.instagram.replace('@', '')}`} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="text-pink-600 hover:text-pink-800 transition-colors"
-                    >
-                      <Instagram className="w-4 h-4" />
-                    </a>
-                  )}
-                  {profileData.facebook && (
-                    <a 
-                      href={profileData.facebook} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="text-blue-600 hover:text-blue-800 transition-colors"
-                    >
-                      <Facebook className="w-4 h-4" />
-                    </a>
-                  )}
-                  {profileData.youtube && (
-                    <a 
-                      href={profileData.youtube} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="text-red-600 hover:text-red-800 transition-colors"
-                    >
-                      <Youtube className="w-4 h-4" />
-                    </a>
-                  )}
-                  {profileData.sitoWeb && (
-                    <a 
-                      href={profileData.sitoWeb} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="text-gray-600 hover:text-gray-800 transition-colors"
-                    >
-                      <Globe className="w-4 h-4" />
-                    </a>
-                  )}
-                </div>
-              )}
             </div>
           )}
 
@@ -966,7 +885,6 @@ export default function PTDashboard() {
         {/* Content Area */}
         <div className="flex-1 p-6 overflow-y-auto">
           <div className="max-w-7xl mx-auto">
-            {/* Error Boundary Wrapper */}
             <div className="min-h-full">
               {renderCurrentComponent()}
             </div>
@@ -987,15 +905,6 @@ export default function PTDashboard() {
           </div>
         </footer>
       </main>
-
-      {/* Mobile Navigation Overlay */}
-      {sidebarCollapsed && (
-        <div className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40" onClick={() => setSidebarCollapsed(false)}>
-          <div className="fixed left-0 top-0 h-full w-64 bg-white transform transition-transform">
-            {/* Same sidebar content for mobile */}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
