@@ -490,91 +490,175 @@ export default function PTDashboard() {
   );
 
   // Settings Component
-  const SettingsView = () => (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center mr-4">
-            <Settings className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Impostazioni</h1>
-            <p className="text-gray-600">Gestisci il tuo account e le preferenze</p>
-          </div>
-        </div>
-      </div>
+  const SettingsView = () => {
+    const [activeSettingsSection, setActiveSettingsSection] = useState('account');
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-xl shadow-sm p-4">
-            <nav className="space-y-2">
-              {[
-                { id: 'account', name: 'Account', icon: User },
-                { id: 'notifications', name: 'Notifiche', icon: Settings },
-                { id: 'privacy', name: 'Privacy', icon: CheckCircle },
-                { id: 'payments', name: 'Pagamenti', icon: Settings },
-                { id: 'dashboard', name: 'Dashboard', icon: Settings },
-                { id: 'danger', name: 'Zona Pericolosa', icon: AlertCircle }
-              ].map((section) => {
-                const Icon = section.icon;
-                return (
-                  <button
-                    key={section.id}
-                    className="w-full flex items-center px-3 py-3 rounded-lg transition-colors text-gray-600 hover:bg-gray-100 text-left"
-                  >
-                    <Icon className="w-5 h-5 mr-3" />
-                    {section.name}
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-        </div>
+    const settingsSections = [
+      { id: 'account', name: 'Account', icon: User, color: 'blue' },
+      { id: 'notifications', name: 'Notifiche', icon: Settings, color: 'yellow' },
+      { id: 'privacy', name: 'Privacy', icon: CheckCircle, color: 'green' },
+      { id: 'payments', name: 'Pagamenti', icon: Settings, color: 'purple' },
+      { id: 'dashboard', name: 'Dashboard', icon: Settings, color: 'pink' },
+      { id: 'danger', name: 'Zona Pericolosa', icon: AlertCircle, color: 'red' }
+    ];
 
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
-              <User className="w-5 h-5 mr-2" />
-              Informazioni Account
-            </h3>
-            
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div>
-                  <h4 className="font-medium text-gray-900">Email Account</h4>
-                  <p className="text-sm text-gray-600">{profileData.email || 'Nessuna email configurata'}</p>
-                </div>
-                <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                  Modifica
-                </button>
-              </div>
+    const renderSettingsContent = () => {
+      switch(activeSettingsSection) {
+        case 'account':
+          return (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                <User className="w-5 h-5 mr-2" />
+                Informazioni Account
+              </h3>
               
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div>
-                  <h4 className="font-medium text-gray-900">Password</h4>
-                  <p className="text-sm text-gray-600">Ultima modifica: Mai</p>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Email Account</h4>
+                    <p className="text-sm text-gray-600">{profileData.email || 'Nessuna email configurata'}</p>
+                  </div>
+                  <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                    Modifica
+                  </button>
                 </div>
-                <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                  Cambia Password
-                </button>
-              </div>
+                
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Password</h4>
+                    <p className="text-sm text-gray-600">Ultima modifica: Mai</p>
+                  </div>
+                  <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                    Cambia Password
+                  </button>
+                </div>
 
-              <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                <div>
-                  <h4 className="font-medium text-gray-900">Notifiche Email</h4>
-                  <p className="text-sm text-gray-600">Ricevi email per aggiornamenti importanti</p>
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Autenticazione a Due Fattori</h4>
+                    <p className="text-sm text-gray-600">Proteggi il tuo account con 2FA</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" defaultChecked className="sr-only peer" />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+          );
+
+        case 'notifications':
+          return (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                <Settings className="w-5 h-5 mr-2" />
+                Gestione Notifiche
+              </h3>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Notifiche Email</h4>
+                    <p className="text-sm text-gray-600">Ricevi email per aggiornamenti importanti</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" defaultChecked className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Nuove Vendite</h4>
+                    <p className="text-sm text-gray-600">Notifiche immediate per nuove vendite</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" defaultChecked className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Nuove Recensioni</h4>
+                    <p className="text-sm text-gray-600">Avvisi per recensioni sui tuoi programmi</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" defaultChecked className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+              </div>
+            </div>
+          );
+
+        case 'privacy':
+          return (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                <CheckCircle className="w-5 h-5 mr-2" />
+                Privacy e Visibilità
+              </h3>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Profilo Pubblico</h4>
+                    <p className="text-sm text-gray-600">Il tuo profilo è visibile agli utenti</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" defaultChecked className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Mostra Email</h4>
+                    <p className="text-sm text-gray-600">Email visibile nel profilo pubblico</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Indicizzazione SEO</h4>
+                    <p className="text-sm text-gray-600">Permetti ai motori di ricerca di indicizzare</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" defaultChecked className="sr-only peer" />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+              </div>
+            </div>
+          );
+
+        case 'payments':
+          return (
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+                <Settings className="w-5 h-5 mr-2" />
+                Pagamenti e Fatturazione
+              </h3>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Metodo di Pagamento</h4>
+                    <p className="text-sm text-gray-600">Nessun metodo configurato</p>
+                  </div>
+                  <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                    Aggiungi
+                  </button>
+                </div>
+                
+                <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div>
+                    <h4 className="font-medium text-gray-900">Pre
 
   // Save status indicator
   const SaveStatusIndicator = () => {
