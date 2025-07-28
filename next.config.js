@@ -15,7 +15,7 @@ const nextConfig = {
     formats: ['image/webp', 'image/avif'],
   },
 
-  // Headers di sicurezza con CSP fix per SVG inline
+  // Headers di sicurezza con CSP fix per SVG inline e font esterni
   async headers() {
     return [
       {
@@ -37,15 +37,16 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
-              "style-src 'self' 'unsafe-inline'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://js.stripe.com https://checkout.stripe.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "img-src 'self' data: blob: https:",
-              "font-src 'self' data:",
-              "connect-src 'self' https://api.stripe.com https://api.airtable.com",
+              "font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com",
+              "connect-src 'self' https://api.stripe.com https://api.airtable.com https://checkout.stripe.com",
               "media-src 'self' data: blob:",
               "object-src 'none'",
               "base-uri 'self'",
-              "form-action 'self'",
+              "form-action 'self' https://checkout.stripe.com",
+              "frame-src 'self' https://checkout.stripe.com https://js.stripe.com",
               "frame-ancestors 'none'",
               "upgrade-insecure-requests"
             ].join('; ')
