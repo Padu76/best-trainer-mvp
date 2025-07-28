@@ -15,7 +15,7 @@ const nextConfig = {
     formats: ['image/webp', 'image/avif'],
   },
 
-  // Headers di sicurezza
+  // Headers di sicurezza con CSP fix per SVG inline
   async headers() {
     return [
       {
@@ -32,6 +32,23 @@ const nextConfig = {
           {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: blob: https:",
+              "font-src 'self' data:",
+              "connect-src 'self' https://api.stripe.com https://api.airtable.com",
+              "media-src 'self' data: blob:",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "frame-ancestors 'none'",
+              "upgrade-insecure-requests"
+            ].join('; ')
           },
         ],
       },
