@@ -1,5 +1,4 @@
 import Stripe from 'stripe';
-import { buffer } from 'micro';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -33,10 +32,12 @@ async function airtableRequest(table, method = 'GET', data = null) {
   return response.json();
 }
 
-// Disable body parsing, need raw body for webhook signature verification
+// Disable body parsing per webhook signature verification
 export const config = {
   api: {
-    bodyParser: false,
+    bodyParser: {
+      sizeLimit: '1mb',
+    },
   },
 };
 
@@ -45,15 +46,16 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const buf = await buffer(req);
   const sig = req.headers['stripe-signature'];
-
   let event;
 
   try {
+    // Per Next.js 14+, il body è già disponibile come stringa
+    const rawBody = JSON.stringify(req.body);
+    
     // Verifica signature del webhook
     event = stripe.webhooks.constructEvent(
-      buf, 
+      rawBody, 
       sig, 
       process.env.STRIPE_WEBHOOK_SECRET
     );
@@ -143,9 +145,6 @@ async function handleCheckoutSessionCompleted(session) {
 async function handlePaymentIntentSucceeded(paymentIntent) {
   console.log('Processing payment intent succeeded:', paymentIntent.id);
   
-  // Questo evento viene dopo checkout.session.completed
-  // Utilizzato per logging e eventuali azioni aggiuntive
-  
   try {
     // Verifica che la transazione sia già stata processata
     const transactionResponse = await airtableRequest(
@@ -166,7 +165,7 @@ async function handlePaymentIntentFailed(paymentIntent) {
   console.log('Processing payment intent failed:', paymentIntent.id);
   
   try {
-    // Trova la transazione tramite payment intent o session
+    // Trova la transazione tramite payment intent
     const transactionResponse = await airtableRequest(
       `transactions?filterByFormula={stripe_payment_intent_id}="${paymentIntent.id}"`
     );
@@ -215,7 +214,7 @@ async function handleTransferCreated(transfer) {
         {
           fields: {
             id: `payout_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
-            pt_id: transfer.metadata?.ptId || 'unknown', // Dovrai aggiungere metadata nel transfer
+            pt_id: transfer.metadata?.ptId || 'unknown',
             stripe_transfer_id: transfer.id,
             amount: transfer.amount / 100, // Converti da centesimi
             status: 'completed',
