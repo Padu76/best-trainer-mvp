@@ -26,7 +26,10 @@ import {
   CheckCircle,
   FileText,
   Video,
-  Upload
+  Upload,
+  Home,
+  ChevronRight,
+  AlertCircle
 } from 'lucide-react';
 
 export default function ProgrammiListing() {
@@ -42,6 +45,7 @@ export default function ProgrammiListing() {
   const [viewMode, setViewMode] = useState('grid'); // grid or list
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [wishlist, setWishlist] = useState([]);
+  const [debugInfo, setDebugInfo] = useState('');
 
   // Mock user per demo
   const currentUser = {
@@ -53,22 +57,42 @@ export default function ProgrammiListing() {
   useEffect(() => {
     const loadProgrammi = () => {
       setLoading(true);
+      let debugMessages = [];
+      
       try {
-        // Carica programmi reali dalla dashboard PT
+        // Debug: controlla cosa c'è nel localStorage
         const savedPrograms = localStorage.getItem('bt_programs_data');
+        debugMessages.push(`LocalStorage bt_programs_data: ${savedPrograms ? 'TROVATO' : 'NON TROVATO'}`);
+        
         let realPrograms = [];
         
         if (savedPrograms) {
-          const parsedPrograms = JSON.parse(savedPrograms);
-          // Filtra solo i programmi pubblicati
-          realPrograms = Array.isArray(parsedPrograms) 
-            ? parsedPrograms.filter(p => p.pubblicato === true)
-            : [];
-          
-          console.log('Programmi caricati dalla dashboard PT:', realPrograms);
+          try {
+            const parsedPrograms = JSON.parse(savedPrograms);
+            debugMessages.push(`Programmi parsati: ${Array.isArray(parsedPrograms) ? parsedPrograms.length : 'NON ARRAY'}`);
+            
+            if (Array.isArray(parsedPrograms)) {
+              // Mostra TUTTI i programmi, non solo quelli pubblicati (per debug)
+              realPrograms = parsedPrograms.map(p => ({
+                ...p,
+                // Se non ha campo pubblicato, assumiamo sia true
+                pubblicato: p.pubblicato !== false
+              }));
+              
+              const pubblicati = realPrograms.filter(p => p.pubblicato === true);
+              debugMessages.push(`Programmi totali: ${realPrograms.length}, Pubblicati: ${pubblicati.length}`);
+              
+              // Per debug, mostra titoli dei programmi
+              realPrograms.forEach((p, i) => {
+                debugMessages.push(`Programma ${i+1}: "${p.titolo}" - Pubblicato: ${p.pubblicato}`);
+              });
+            }
+          } catch (parseError) {
+            debugMessages.push(`Errore parsing JSON: ${parseError.message}`);
+          }
         }
 
-        // Dati mock per demo (puoi rimuoverli quando hai abbastanza programmi reali)
+        // Dati mock per demo
         const mockPrograms = [
           {
             id: 'mock_1',
@@ -136,7 +160,7 @@ export default function ProgrammiListing() {
           vendite: p.vendite || 0,
           trainer: p.trainer || {
             id: 'pt_unknown',
-            nome: 'Personal Trainer',
+            nome: p.nomeTrainer || 'Personal Trainer',
             foto: null,
             rating: 0,
             numeroStudenti: 0
@@ -148,11 +172,20 @@ export default function ProgrammiListing() {
           download: p.vendite || 0
         }));
 
-        setProgrammi(normalizedPrograms);
-        console.log('Tutti i programmi caricati:', normalizedPrograms);
+        // Filtra solo quelli pubblicati per la visualizzazione finale
+        const publishedPrograms = normalizedPrograms.filter(p => p.pubblicato === true);
+        
+        setProgrammi(publishedPrograms);
+        debugMessages.push(`Programmi finali mostrati: ${publishedPrograms.length}`);
+        
+        setDebugInfo(debugMessages.join('\n'));
+        console.log('DEBUG PROGRAMMI:', debugMessages.join('\n'));
+        console.log('Tutti i programmi caricati:', publishedPrograms);
         
       } catch (error) {
         console.error('Errore nel caricamento programmi:', error);
+        debugMessages.push(`ERRORE: ${error.message}`);
+        setDebugInfo(debugMessages.join('\n'));
         setProgrammi([]);
       } finally {
         setLoading(false);
@@ -311,18 +344,40 @@ export default function ProgrammiListing() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      {/* Navigation Header con Home Button */}
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="text-center mb-8">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          {/* Breadcrumb Navigation */}
+          <div className="flex items-center space-x-2 text-sm mb-4">
+            <Link href="/" className="flex items-center text-blue-600 hover:text-blue-700 transition-colors">
+              <Home className="w-4 h-4 mr-1" />
+              Home
+            </Link>
+            <ChevronRight className="w-4 h-4 text-gray-400" />
+            <span className="text-gray-600">Programmi</span>
+          </div>
+          
+          {/* Main Header */}
+          <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Tutti i Programmi</h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Trova il programma perfetto per i tuoi obiettivi tra {programmi.length} opzioni disponibili
             </p>
           </div>
 
+          {/* Debug Info (solo in sviluppo - rimuovi in produzione) */}
+          {process.env.NODE_ENV === 'development' && debugInfo && (
+            <details className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <summary className="cursor-pointer text-yellow-800 font-medium flex items-center">
+                <AlertCircle className="w-4 h-4 mr-2" />
+                Debug Info (solo sviluppo)
+              </summary>
+              <pre className="text-xs text-yellow-700 mt-2 whitespace-pre-wrap">{debugInfo}</pre>
+            </details>
+          )}
+
           {/* Search Bar */}
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-2xl mx-auto mt-8">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -555,6 +610,11 @@ export default function ProgrammiListing() {
                         {programma.isMock && (
                           <span className="bg-green-600 text-white px-2 py-1 rounded-full text-xs font-medium">
                             Demo
+                          </span>
+                        )}
+                        {!programma.isMock && (
+                          <span className="bg-purple-600 text-white px-2 py-1 rounded-full text-xs font-medium">
+                            PT
                           </span>
                         )}
                       </div>
