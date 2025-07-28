@@ -67,6 +67,7 @@ export default function ProgramsManagement() {
   const [showBulkActions, setShowBulkActions] = useState(false);
   const [editingProgram, setEditingProgram] = useState(null);
   const [saveStatus, setSaveStatus] = useState('');
+  const [loading, setLoading] = useState(true);
 
   // Form states
   const [programForm, setProgramForm] = useState({
@@ -123,21 +124,38 @@ export default function ProgramsManagement() {
     5: 'Molto Difficile'
   };
 
-  // Load data from localStorage
+  // Load data from localStorage con error handling migliorato
   useEffect(() => {
-    const savedPrograms = localStorage.getItem('bt_programs_data');
-    if (savedPrograms) {
+    const loadData = async () => {
+      setLoading(true);
       try {
-        setProgrammi(JSON.parse(savedPrograms));
+        console.log('Caricamento programmi dal localStorage...');
+        const savedPrograms = localStorage.getItem('bt_programs_data');
+        
+        if (savedPrograms) {
+          const parsedPrograms = JSON.parse(savedPrograms);
+          console.log('Programmi caricati:', parsedPrograms);
+          setProgrammi(Array.isArray(parsedPrograms) ? parsedPrograms : []);
+        } else {
+          console.log('Nessun programma trovato nel localStorage');
+          setProgrammi([]);
+        }
       } catch (error) {
         console.error('Errore nel caricamento dei programmi:', error);
+        setProgrammi([]);
+        setSaveStatus('error');
+      } finally {
+        setLoading(false);
       }
-    }
+    };
+
+    loadData();
   }, []);
 
-  // Save to localStorage
+  // Save to localStorage con error handling migliorato
   const saveProgramsToLocalStorage = (data) => {
     try {
+      console.log('Salvando programmi nel localStorage:', data);
       localStorage.setItem('bt_programs_data', JSON.stringify(data));
       setSaveStatus('saved');
       setTimeout(() => setSaveStatus(''), 3000);
@@ -170,12 +188,15 @@ export default function ProgramsManagement() {
   }
 
   function getTopCategory() {
+    if (programmi.length === 0) return 'N/A';
+    
     const categoryCount = {};
     programmi.forEach(p => {
       if (p.categoria) {
         categoryCount[p.categoria] = (categoryCount[p.categoria] || 0) + (p.vendite || 0);
       }
     });
+    
     return Object.keys(categoryCount).length ? 
            Object.keys(categoryCount).reduce((a, b) => categoryCount[a] > categoryCount[b] ? a : b) : 
            'N/A';
@@ -373,6 +394,33 @@ export default function ProgramsManagement() {
     }
   };
 
+  // Reset form function
+  const resetForm = () => {
+    setProgramForm({
+      titolo: '',
+      descrizione: '',
+      prezzo: '',
+      categoria: '',
+      livello: '',
+      durata: '',
+      tipoContenuto: '',
+      copertina: null,
+      file: null,
+      video: null,
+      covertinaPreview: null,
+      filePreview: null,
+      videoPreview: null,
+      tags: [],
+      difficolta: 1,
+      equipmentRequired: [],
+      pubblicazioneSchedulata: '',
+      limitedTime: false,
+      scontoPercentuale: 0
+    });
+    setFormErrors({});
+    setEditingProgram(null);
+  };
+
   // Program actions
   const handleCreateProgram = () => {
     setSaveStatus('saving');
@@ -402,15 +450,7 @@ export default function ProgramsManagement() {
     setProgrammi(updatedPrograms);
     saveProgramsToLocalStorage(updatedPrograms);
     
-    // Reset form
-    setProgramForm({
-      titolo: '', descrizione: '', prezzo: '', categoria: '', livello: '', durata: '',
-      tipoContenuto: '', copertina: null, file: null, video: null,
-      covertinaPreview: null, filePreview: null, videoPreview: null,
-      tags: [], difficolta: 1, equipmentRequired: [], pubblicazioneSchedulata: '',
-      limitedTime: false, scontoPercentuale: 0
-    });
-    setFormErrors({});
+    resetForm();
     setActiveView('list');
   };
 
@@ -436,6 +476,7 @@ export default function ProgramsManagement() {
     setProgrammi(updatedPrograms);
     saveProgramsToLocalStorage(updatedPrograms);
     setEditingProgram(null);
+    resetForm();
     setActiveView('list');
   };
 
@@ -501,6 +542,7 @@ export default function ProgramsManagement() {
   };
 
   const handleEditProgram = (program) => {
+    console.log('Editing program:', program);
     setEditingProgram(program);
     setProgramForm({
       ...program,
@@ -508,6 +550,7 @@ export default function ProgramsManagement() {
       equipmentRequired: program.equipmentRequired || [],
       difficolta: program.difficolta || 1
     });
+    setFormErrors({});
     setActiveView('edit');
   };
 
@@ -541,6 +584,18 @@ export default function ProgramsManagement() {
       </div>
     );
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Caricamento programmi...</p>
+        </div>
+      </div>
+    );
+  }
 
   const StatsCards = () => (
     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -750,15 +805,7 @@ export default function ProgramsManagement() {
             </button>
             <button
               onClick={() => {
-                setProgramForm({
-                  titolo: '', descrizione: '', prezzo: '', categoria: '', livello: '', durata: '',
-                  tipoContenuto: '', copertina: null, file: null, video: null,
-                  covertinaPreview: null, filePreview: null, videoPreview: null,
-                  tags: [], difficolta: 1, equipmentRequired: [], pubblicazioneSchedulata: '',
-                  limitedTime: false, scontoPercentuale: 0
-                });
-                setFormErrors({});
-                setEditingProgram(null);
+                resetForm();
                 setActiveView('create');
               }}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center"
@@ -803,7 +850,10 @@ export default function ProgramsManagement() {
                       Crea il tuo primo programma di allenamento per iniziare a vendere
                     </p>
                     <button
-                      onClick={() => setActiveView('create')}
+                      onClick={() => {
+                        resetForm();
+                        setActiveView('create');
+                      }}
                       className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center mx-auto"
                     >
                       <Plus className="w-4 h-4 mr-2" />
@@ -1079,7 +1129,10 @@ export default function ProgramsManagement() {
               {activeView === 'create' ? 'Nuovo Programma' : 'Modifica Programma'}
             </h3>
             <button
-              onClick={() => setActiveView('list')}
+              onClick={() => {
+                resetForm();
+                setActiveView('list');
+              }}
               className="text-gray-400 hover:text-gray-600"
             >
               <X className="w-6 h-6" />
@@ -1479,7 +1532,10 @@ export default function ProgramsManagement() {
             <div className="flex justify-between items-center pt-8 border-t border-gray-200">
               <button
                 type="button"
-                onClick={() => setActiveView('list')}
+                onClick={() => {
+                  resetForm();
+                  setActiveView('list');
+                }}
                 className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Annulla
