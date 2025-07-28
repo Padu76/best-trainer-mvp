@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
+import ProgramCheckout from './ProgramCheckout';
 import { 
   Star, 
   Clock, 
@@ -28,10 +29,19 @@ export default function ProgrammaDetail() {
   const [activeTab, setActiveTab] = useState('descrizione');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
+  
+  // Mock user - In un'app reale verrà da context/session
+  const currentUser = {
+    id: 'user_123',
+    nome: 'Mario',
+    cognome: 'Rossi',
+    email: 'mario.rossi@email.com'
+  };
   
   // Dati del programma (in un'app reale verrebbero da props o API)
   const programma = {
-    id: 1,
+    id: 'prog_001',
     titolo: "Programma Massa Muscolare Avanzato",
     sottotitolo: "12 settimane per trasformare il tuo fisico",
     prezzo: 79.99,
@@ -45,7 +55,9 @@ export default function ProgrammaDetail() {
     attrezzatura: "Palestra Completa",
     lingue: ["Italiano", "Inglese"],
     ultimoAggiornamento: "Dicembre 2024",
+    description: "Un programma completo per massimizzare l'ipertrofia muscolare in 12 settimane.",
     trainer: {
+      id: 'pt_001',
       nome: "Marco Rossi",
       username: "marcorossifitness",
       foto: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=100&h=100&fit=crop&crop=face",
@@ -170,6 +182,11 @@ Questo non è il solito programma generalista: ogni fase è stata scientificamen
     setCurrentImageIndex((prev) => 
       prev === 0 ? programma.immagini.length - 1 : prev - 1
     );
+  };
+
+  const handleCheckoutSuccess = () => {
+    setShowCheckout(false);
+    // Reindirizzamento gestito dal componente checkout
   };
 
   const tabs = [
@@ -496,49 +513,84 @@ Questo non è il solito programma generalista: ogni fase è stata scientificamen
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            {/* Purchase Card */}
-            <div className="bg-white rounded-xl shadow-sm p-6 mb-6 sticky top-6">
-              <div className="mb-6">
-                <div className="flex items-baseline">
-                  <span className="text-3xl font-bold text-gray-900">
-                    €{programma.prezzo}
-                  </span>
-                  <span className="text-lg text-gray-500 line-through ml-2">
-                    €{programma.prezzoOriginale}
-                  </span>
-                  <span className="ml-2 bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full">
-                    -33%
-                  </span>
-                </div>
-                <p className="text-sm text-gray-500 mt-1">
-                  Accesso a vita • Aggiornamenti gratuiti
-                </p>
-              </div>
+            {/* Purchase Card con Checkout integrato */}
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6 sticky top-6">
+              {!showCheckout ? (
+                // Vista normale con prezzi e pulsanti
+                <div className="p-6">
+                  <div className="mb-6">
+                    <div className="flex items-baseline">
+                      <span className="text-3xl font-bold text-gray-900">
+                        €{programma.prezzo}
+                      </span>
+                      <span className="text-lg text-gray-500 line-through ml-2">
+                        €{programma.prezzoOriginale}
+                      </span>
+                      <span className="ml-2 bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full">
+                        -33%
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Accesso a vita • Aggiornamenti gratuiti
+                    </p>
+                  </div>
 
-              <div className="space-y-3 mb-6">
-                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-4 px-6 rounded-lg transition-colors flex items-center justify-center">
-                  Acquista Ora
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </button>
-                <button className="w-full border-2 border-gray-200 text-gray-700 font-medium py-4 px-6 rounded-lg hover:border-blue-200 hover:text-blue-600 transition-colors">
-                  Aggiungi al Carrello
-                </button>
-              </div>
+                  <div className="space-y-3 mb-6">
+                    <button 
+                      onClick={() => setShowCheckout(true)}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-4 px-6 rounded-lg transition-colors flex items-center justify-center"
+                    >
+                      Acquista Ora
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </button>
+                    <button className="w-full border-2 border-gray-200 text-gray-700 font-medium py-4 px-6 rounded-lg hover:border-blue-200 hover:text-blue-600 transition-colors">
+                      Aggiungi al Carrello
+                    </button>
+                  </div>
 
-              <div className="space-y-3 text-sm">
-                <div className="flex items-center">
-                  <Shield className="w-4 h-4 text-green-600 mr-2" />
-                  <span>Garanzia soddisfatti o rimborsati 30 giorni</span>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex items-center">
+                      <Shield className="w-4 h-4 text-green-600 mr-2" />
+                      <span>Garanzia soddisfatti o rimborsati 30 giorni</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Download className="w-4 h-4 text-blue-600 mr-2" />
+                      <span>Download immediato dopo l'acquisto</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Calendar className="w-4 h-4 text-purple-600 mr-2" />
+                      <span>Aggiornato {programma.ultimoAggiornamento}</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center">
-                  <Download className="w-4 h-4 text-blue-600 mr-2" />
-                  <span>Download immediato dopo l'acquisto</span>
+              ) : (
+                // Vista checkout
+                <div className="p-4">
+                  <div className="mb-4">
+                    <button
+                      onClick={() => setShowCheckout(false)}
+                      className="text-sm text-gray-500 hover:text-gray-700 flex items-center"
+                    >
+                      <ChevronLeft className="w-4 h-4 mr-1" />
+                      Torna indietro
+                    </button>
+                  </div>
+                  <ProgramCheckout
+                    program={{
+                      id: programma.id,
+                      title: programma.titolo,
+                      price: programma.prezzo,
+                      description: programma.description
+                    }}
+                    pt={{
+                      id: programma.trainer.id,
+                      name: programma.trainer.nome
+                    }}
+                    user={currentUser}
+                    onSuccess={handleCheckoutSuccess}
+                  />
                 </div>
-                <div className="flex items-center">
-                  <Calendar className="w-4 h-4 text-purple-600 mr-2" />
-                  <span>Aggiornato {programma.ultimoAggiornamento}</span>
-                </div>
-              </div>
+              )}
             </div>
 
             {/* Trainer Info */}
