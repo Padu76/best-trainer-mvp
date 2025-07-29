@@ -30,26 +30,89 @@ export default function ProfessionistiPage() {
 
   const specializzazioni = [
     { id: 'tutti', label: 'Tutte le Specializzazioni', emoji: '🏆' },
-    { id: 'massa', label: 'Massa Muscolare', emoji: '💪' },
+    { id: 'palestra', label: 'Palestra & Fitness', emoji: '💪' },
+    { id: 'massa', label: 'Massa Muscolare', emoji: '🏋️' },
     { id: 'dimagrimento', label: 'Dimagrimento', emoji: '🔥' },
     { id: 'forza', label: 'Forza & Potenza', emoji: '⚡' },
     { id: 'cardio', label: 'Cardio & Resistenza', emoji: '❤️' },
     { id: 'functional', label: 'Functional Training', emoji: '🤸' },
     { id: 'yoga', label: 'Yoga & Stretching', emoji: '🧘' },
-    { id: 'preparazione', label: 'Preparazione Atletica', emoji: '🏃' },
-    { id: 'riabilitazione', label: 'Riabilitazione', emoji: '🩺' }
+    { id: 'corsa', label: 'Corsa & Running', emoji: '🏃' },
+    { id: 'home', label: 'Home Workout', emoji: '🏠' },
+    { id: 'ciclismo', label: 'Ciclismo', emoji: '🚴' },
+    { id: 'nuoto', label: 'Nuoto', emoji: '🏊' },
+    { id: 'arti_marziali', label: 'Arti Marziali', emoji: '🥋' },
+    { id: 'preparazione', label: 'Preparazione Atletica', emoji: '🎯' },
+    { id: 'preparazione_militare', label: 'Preparazione Militare', emoji: '🪖' },
+    { id: 'crossfit', label: 'CrossFit', emoji: '🏋️‍♀️' },
+    { id: 'pilates', label: 'Pilates', emoji: '🤸‍♀️' },
+    { id: 'danza', label: 'Danza & Ballo', emoji: '💃' },
+    { id: 'boxe', label: 'Boxe & Kickboxing', emoji: '🥊' },
+    { id: 'tennis', label: 'Tennis', emoji: '🎾' },
+    { id: 'calcio', label: 'Calcio', emoji: '⚽' },
+    { id: 'basket', label: 'Basket', emoji: '🏀' },
+    { id: 'pallavolo', label: 'Pallavolo', emoji: '🏐' },
+    { id: 'riabilitazione', label: 'Riabilitazione', emoji: '🩺' },
+    { id: 'postura', label: 'Postura & Benessere', emoji: '🧘‍♂️' },
+    { id: 'terza_eta', label: 'Terza Età', emoji: '👴' },
+    { id: 'gravidanza', label: 'Gravidanza & Post Parto', emoji: '🤰' }
   ];
 
   const citta = [
     { id: 'tutte', label: 'Tutte le Città' },
     { id: 'milano', label: 'Milano' },
     { id: 'roma', label: 'Roma' },
-    { id: 'torino', label: 'Torino' },
     { id: 'napoli', label: 'Napoli' },
-    { id: 'firenze', label: 'Firenze' },
-    { id: 'bologna', label: 'Bologna' },
+    { id: 'torino', label: 'Torino' },
     { id: 'palermo', label: 'Palermo' },
-    { id: 'online', label: 'Online' }
+    { id: 'genova', label: 'Genova' },
+    { id: 'bologna', label: 'Bologna' },
+    { id: 'firenze', label: 'Firenze' },
+    { id: 'bari', label: 'Bari' },
+    { id: 'catania', label: 'Catania' },
+    { id: 'venezia', label: 'Venezia' },
+    { id: 'verona', label: 'Verona' },
+    { id: 'messina', label: 'Messina' },
+    { id: 'padova', label: 'Padova' },
+    { id: 'trieste', label: 'Trieste' },
+    { id: 'brescia', label: 'Brescia' },
+    { id: 'taranto', label: 'Taranto' },
+    { id: 'prato', label: 'Prato' },
+    { id: 'reggio_calabria', label: 'Reggio Calabria' },
+    { id: 'modena', label: 'Modena' },
+    { id: 'reggio_emilia', label: 'Reggio Emilia' },
+    { id: 'perugia', label: 'Perugia' },
+    { id: 'ravenna', label: 'Ravenna' },
+    { id: 'livorno', label: 'Livorno' },
+    { id: 'cagliari', label: 'Cagliari' },
+    { id: 'foggia', label: 'Foggia' },
+    { id: 'rimini', label: 'Rimini' },
+    { id: 'salerno', label: 'Salerno' },
+    { id: 'ferrara', label: 'Ferrara' },
+    { id: 'sassari', label: 'Sassari' },
+    { id: 'latina', label: 'Latina' },
+    { id: 'giugliano', label: 'Giugliano in Campania' },
+    { id: 'monza', label: 'Monza' },
+    { id: 'siracusa', label: 'Siracusa' },
+    { id: 'pescara', label: 'Pescara' },
+    { id: 'bergamo', label: 'Bergamo' },
+    { id: 'forlì', label: 'Forlì' },
+    { id: 'trento', label: 'Trento' },
+    { id: 'vicenza', label: 'Vicenza' },
+    { id: 'terni', label: 'Terni' },
+    { id: 'bolzano', label: 'Bolzano' },
+    { id: 'novara', label: 'Novara' },
+    { id: 'piacenza', label: 'Piacenza' },
+    { id: 'ancona', label: 'Ancona' },
+    { id: 'lecce', label: 'Lecce' },
+    { id: 'udine', label: 'Udine' },
+    { id: 'cesena', label: 'Cesena' },
+    { id: 'pesaro', label: 'Pesaro' },
+    { id: 'como', label: 'Como' },
+    { id: 'la_spezia', label: 'La Spezia' },
+    { id: 'brindisi', label: 'Brindisi' },
+    { id: 'online', label: 'Online' },
+    { id: 'estero', label: 'Estero' }
   ];
 
   const personalTrainers = [
@@ -180,6 +243,70 @@ export default function ProfessionistiPage() {
       immagine: "https://images.unsplash.com/photo-1550345332-09e3ac987658?w=300&h=300&fit=crop&face=center",
       disponibile: true,
       badge: "Wellness"
+    },
+    {
+      id: 9,
+      nome: "Alessandro Swim",
+      specializzazioni: ["nuoto", "cardio"],
+      citta: "genova",
+      rating: 4.8,
+      recensioni: 92,
+      programmiCreati: 5,
+      esperienza: "9 anni",
+      certificazioni: ["FIN", "CONI"],
+      prezzo: "€50-70/ora",
+      descrizione: "Ex nuotatore agonista, specialista in tecnica del nuoto e resistenza acquatica.",
+      immagine: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=300&fit=crop&face=center",
+      disponibile: true,
+      badge: "Aqua Expert"
+    },
+    {
+      id: 10,
+      nome: "Simone Fighter",
+      specializzazioni: ["arti_marziali", "boxe"],
+      citta: "venezia",
+      rating: 4.7,
+      recensioni: 78,
+      programmiCreati: 8,
+      esperienza: "11 anni",
+      certificazioni: ["FIJLKAM", "FPI"],
+      prezzo: "€55-75/ora",
+      descrizione: "Maestro di arti marziali e istruttore di boxe, preparazione combattimento.",
+      immagine: "https://images.unsplash.com/photo-1567013127542-490d757e51cd?w=300&h=300&fit=crop&face=center",
+      disponibile: true,
+      badge: "Combat Pro"
+    },
+    {
+      id: 11,
+      nome: "Chiara Home",
+      specializzazioni: ["home", "pilates"],
+      citta: "online",
+      rating: 4.9,
+      recensioni: 134,
+      programmiCreati: 15,
+      esperienza: "6 anni",
+      certificazioni: ["PILATES", "NASM"],
+      prezzo: "€30-50/ora",
+      descrizione: "Specialista in allenamenti a casa senza attrezzi e pilates online.",
+      immagine: "https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?w=300&h=300&fit=crop&face=center",
+      disponibile: true,
+      badge: "Home Trainer"
+    },
+    {
+      id: 12,
+      nome: "Roberto Cycle",
+      specializzazioni: ["ciclismo", "cardio"],
+      citta: "verona",
+      rating: 4.6,
+      recensioni: 65,
+      programmiCreati: 7,
+      esperienza: "8 anni",
+      certificazioni: ["FCI", "CONI"],
+      prezzo: "€45-65/ora",
+      descrizione: "Ex ciclista professionista, specialista in allenamento indoor e outdoor cycling.",
+      immagine: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=300&h=300&fit=crop&face=center",
+      disponibile: true,
+      badge: "Cycling Pro"
     }
   ];
 
@@ -204,7 +331,11 @@ export default function ProfessionistiPage() {
       'Expert': 'bg-blue-500',
       'Rising Star': 'bg-orange-500',
       'Digital Expert': 'bg-cyan-500',
-      'Wellness': 'bg-pink-500'
+      'Wellness': 'bg-pink-500',
+      'Aqua Expert': 'bg-blue-600',
+      'Combat Pro': 'bg-red-500',
+      'Home Trainer': 'bg-green-600',
+      'Cycling Pro': 'bg-yellow-600'
     };
     return colors[badge] || 'bg-gray-500';
   };
@@ -330,7 +461,7 @@ export default function ProfessionistiPage() {
                 <div className="text-sm text-blue-100">Rating Medio</div>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                <div className="text-2xl font-bold text-blue-200">9</div>
+                <div className="text-2xl font-bold text-blue-200">{specializzazioni.length - 1}</div>
                 <div className="text-sm text-blue-100">Specializzazioni</div>
               </div>
             </div>
@@ -450,7 +581,7 @@ export default function ProfessionistiPage() {
 
                     <div className="flex items-center text-sm text-gray-600 mb-3">
                       <MapPin className="w-4 h-4 mr-1" />
-                      {trainer.citta.charAt(0).toUpperCase() + trainer.citta.slice(1)}
+                      {trainer.citta.charAt(0).toUpperCase() + trainer.citta.slice(1).replace('_', ' ')}
                       <span className="mx-2">•</span>
                       <Clock className="w-4 h-4 mr-1" />
                       {trainer.esperienza}
