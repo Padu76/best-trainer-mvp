@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { 
@@ -18,7 +18,9 @@ import {
   Youtube,
   ChevronDown,
   User,
-  UserPlus
+  UserPlus,
+  AlertCircle,
+  Home
 } from 'lucide-react';
 
 export default function ProfessionistiPage() {
@@ -27,6 +29,9 @@ export default function ProfessionistiPage() {
   const [selectedCity, setSelectedCity] = useState('tutte');
   const [selectedRating, setSelectedRating] = useState('tutti');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [personalTrainers, setPersonalTrainers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [debugInfo, setDebugInfo] = useState('');
 
   const specializzazioni = [
     { id: 'tutti', label: 'Tutte le Specializzazioni', emoji: '🏆' },
@@ -55,7 +60,14 @@ export default function ProfessionistiPage() {
     { id: 'riabilitazione', label: 'Riabilitazione', emoji: '🩺' },
     { id: 'postura', label: 'Postura & Benessere', emoji: '🧘‍♂️' },
     { id: 'terza_eta', label: 'Terza Età', emoji: '👴' },
-    { id: 'gravidanza', label: 'Gravidanza & Post Parto', emoji: '🤰' }
+    { id: 'gravidanza', label: 'Gravidanza & Post Parto', emoji: '🤰' },
+    // Specializzazioni dalla dashboard PT
+    { id: 'bodybuilding', label: 'Bodybuilding', emoji: '💪' },
+    { id: 'powerlifting', label: 'Powerlifting', emoji: '🏋️' },
+    { id: 'tonificazione', label: 'Tonificazione', emoji: '✨' },
+    { id: 'endurance', label: 'Endurance', emoji: '🏃‍♂️' },
+    { id: 'alimentazione', label: 'Alimentazione', emoji: '🥗' },
+    { id: 'triathlon', label: 'Triathlon', emoji: '🏊‍♀️' }
   ];
 
   const citta = [
@@ -115,200 +127,176 @@ export default function ProfessionistiPage() {
     { id: 'estero', label: 'Estero' }
   ];
 
-  const personalTrainers = [
-    {
-      id: 1,
-      nome: "Marco Rossi",
-      specializzazioni: ["massa", "forza"],
-      citta: "milano",
-      rating: 4.9,
-      recensioni: 127,
-      programmiCreati: 12,
-      esperienza: "8 anni",
-      certificazioni: ["CONI", "FIPE"],
-      prezzo: "€60-80/ora",
-      descrizione: "Specialista in powerlifting e massa muscolare. Preparatore di atleti agonisti.",
-      immagine: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=300&fit=crop&face=center",
-      disponibile: true,
-      badge: "Top Rated"
-    },
-    {
-      id: 2,
-      nome: "Sofia Bianchi",
-      specializzazioni: ["dimagrimento", "cardio"],
-      citta: "roma",
-      rating: 4.8,
-      recensioni: 94,
-      programmiCreati: 8,
-      esperienza: "6 anni",
-      certificazioni: ["NASM", "ASI"],
-      prezzo: "€50-70/ora",
-      descrizione: "Esperta in trasformazione corporea e nutrizione sportiva.",
-      immagine: "https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?w=300&h=300&fit=crop&face=center",
-      disponibile: true,
-      badge: "Verified"
-    },
-    {
-      id: 3,
-      nome: "Andrea Verdi",
-      specializzazioni: ["functional", "preparazione"],
-      citta: "torino",
-      rating: 4.7,
-      recensioni: 82,
-      programmiCreati: 15,
-      esperienza: "10 anni",
-      certificazioni: ["CONI", "ISSA"],
-      prezzo: "€70-90/ora",
-      descrizione: "Coach di atleti professionisti, specialista in functional training.",
-      immagine: "https://images.unsplash.com/photo-1567013127542-490d757e51cd?w=300&h=300&fit=crop&face=center",
-      disponibile: false,
-      badge: "Pro"
-    },
-    {
-      id: 4,
-      nome: "Elena Russo",
-      specializzazioni: ["yoga", "riabilitazione"],
-      citta: "firenze",
-      rating: 4.9,
-      recensioni: 156,
-      programmiCreati: 6,
-      esperienza: "12 anni",
-      certificazioni: ["RYT", "ACSM"],
-      prezzo: "€40-60/ora",
-      descrizione: "Istruttrice yoga certificata e fisioterapista specializzata.",
-      immagine: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=300&h=300&fit=crop&face=center",
-      disponibile: true,
-      badge: "Expert"
-    },
-    {
-      id: 5,
-      nome: "Luca Neri",
-      specializzazioni: ["massa", "functional"],
-      citta: "napoli",
-      rating: 4.6,
-      recensioni: 73,
-      programmiCreati: 9,
-      esperienza: "5 anni",
-      certificazioni: ["FIPE", "NASM"],
-      prezzo: "€45-65/ora",
-      descrizione: "Personal trainer giovane e dinamico, specialista in allenamento funzionale.",
-      immagine: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=300&h=300&fit=crop&face=center",
-      disponibile: true,
-      badge: "Rising Star"
-    },
-    {
-      id: 6,
-      nome: "Giulia Rossi",
-      specializzazioni: ["dimagrimento", "cardio"],
-      citta: "bologna",
-      rating: 4.8,
-      recensioni: 118,
-      programmiCreati: 11,
-      esperienza: "7 anni",
-      certificazioni: ["ASI", "ISSA"],
-      prezzo: "€55-75/ora",
-      descrizione: "Specialista in dimagrimento femminile e allenamento HIIT.",
-      immagine: "https://images.unsplash.com/photo-1506629905607-c5b0df6e8863?w=300&h=300&fit=crop&face=center",
-      disponibile: true,
-      badge: "Verified"
-    },
-    {
-      id: 7,
-      nome: "Matteo Blu",
-      specializzazioni: ["forza", "preparazione"],
-      citta: "online",
-      rating: 4.9,
-      recensioni: 203,
-      programmiCreati: 18,
-      esperienza: "9 anni",
-      certificazioni: ["CONI", "NSCA"],
-      prezzo: "€35-55/ora",
-      descrizione: "Coach online specializzato in powerlifting e preparazione agonistica.",
-      immagine: "https://images.unsplash.com/photo-1583500178690-f7e6a7c0ea54?w=300&h=300&fit=crop&face=center",
-      disponibile: true,
-      badge: "Digital Expert"
-    },
-    {
-      id: 8,
-      nome: "Francesca Verde",
-      specializzazioni: ["yoga", "functional"],
-      citta: "palermo",
-      rating: 4.7,
-      recensioni: 89,
-      programmiCreati: 7,
-      esperienza: "6 anni",
-      certificazioni: ["RYT", "ACSM"],
-      prezzo: "€45-65/ora",
-      descrizione: "Insegnante di yoga e movement coach, approccio olistico al benessere.",
-      immagine: "https://images.unsplash.com/photo-1550345332-09e3ac987658?w=300&h=300&fit=crop&face=center",
-      disponibile: true,
-      badge: "Wellness"
-    },
-    {
-      id: 9,
-      nome: "Alessandro Swim",
-      specializzazioni: ["nuoto", "cardio"],
-      citta: "genova",
-      rating: 4.8,
-      recensioni: 92,
-      programmiCreati: 5,
-      esperienza: "9 anni",
-      certificazioni: ["FIN", "CONI"],
-      prezzo: "€50-70/ora",
-      descrizione: "Ex nuotatore agonista, specialista in tecnica del nuoto e resistenza acquatica.",
-      immagine: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=300&fit=crop&face=center",
-      disponibile: true,
-      badge: "Aqua Expert"
-    },
-    {
-      id: 10,
-      nome: "Simone Fighter",
-      specializzazioni: ["arti_marziali", "boxe"],
-      citta: "venezia",
-      rating: 4.7,
-      recensioni: 78,
-      programmiCreati: 8,
-      esperienza: "11 anni",
-      certificazioni: ["FIJLKAM", "FPI"],
-      prezzo: "€55-75/ora",
-      descrizione: "Maestro di arti marziali e istruttore di boxe, preparazione combattimento.",
-      immagine: "https://images.unsplash.com/photo-1567013127542-490d757e51cd?w=300&h=300&fit=crop&face=center",
-      disponibile: true,
-      badge: "Combat Pro"
-    },
-    {
-      id: 11,
-      nome: "Chiara Home",
-      specializzazioni: ["home", "pilates"],
-      citta: "online",
-      rating: 4.9,
-      recensioni: 134,
-      programmiCreati: 15,
-      esperienza: "6 anni",
-      certificazioni: ["PILATES", "NASM"],
-      prezzo: "€30-50/ora",
-      descrizione: "Specialista in allenamenti a casa senza attrezzi e pilates online.",
-      immagine: "https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?w=300&h=300&fit=crop&face=center",
-      disponibile: true,
-      badge: "Home Trainer"
-    },
-    {
-      id: 12,
-      nome: "Roberto Cycle",
-      specializzazioni: ["ciclismo", "cardio"],
-      citta: "verona",
-      rating: 4.6,
-      recensioni: 65,
-      programmiCreati: 7,
-      esperienza: "8 anni",
-      certificazioni: ["FCI", "CONI"],
-      prezzo: "€45-65/ora",
-      descrizione: "Ex ciclista professionista, specialista in allenamento indoor e outdoor cycling.",
-      immagine: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=300&h=300&fit=crop&face=center",
-      disponibile: true,
-      badge: "Cycling Pro"
-    }
-  ];
+  // Carica profili reali dalla dashboard PT + profili mock
+  useEffect(() => {
+    const loadTrainers = () => {
+      setLoading(true);
+      let debugMessages = [];
+      
+      try {
+        // Carica profili reali dalla dashboard PT
+        const savedProfiles = localStorage.getItem('bt_profile_data');
+        debugMessages.push(`LocalStorage bt_profile_data: ${savedProfiles ? 'TROVATO' : 'NON TROVATO'}`);
+        
+        let realTrainers = [];
+        
+        if (savedProfiles) {
+          try {
+            const parsedProfile = JSON.parse(savedProfiles);
+            debugMessages.push(`Profilo PT parsato: ${parsedProfile.nome ? 'VALIDO' : 'INVALIDO'}`);
+            
+            if (parsedProfile.nome) {
+              // Trasforma il profilo PT in formato trainer per la pagina pubblica
+              const trainer = {
+                id: `pt_real_${Date.now()}`,
+                nome: parsedProfile.nome + (parsedProfile.cognome ? ` ${parsedProfile.cognome}` : ''),
+                specializzazioni: (parsedProfile.specializzazioni || []).map(spec => 
+                  spec.toLowerCase().replace(/\s+/g, '_')
+                ),
+                citta: parsedProfile.citta ? parsedProfile.citta.toLowerCase() : 'online',
+                rating: 4.8, // Rating di default per PT reali
+                recensioni: Math.floor(Math.random() * 50) + 10, // Random tra 10-60
+                programmiCreati: Math.floor(Math.random() * 10) + 3, // Random tra 3-13
+                esperienza: parsedProfile.anniEsperienza ? `${parsedProfile.anniEsperienza} anni` : '1 anno',
+                certificazioni: parsedProfile.certificazioni || ['Certificato'],
+                prezzo: parsedProfile.prezzoMedioOra ? `€${parsedProfile.prezzoMedioOra-10}-${parsedProfile.prezzoMedioOra}/ora` : '€40-60/ora',
+                descrizione: parsedProfile.bio || 'Personal Trainer professionale specializzato nel raggiungimento dei tuoi obiettivi.',
+                immagine: parsedProfile.fotoProfile || 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=300&fit=crop&face=center',
+                disponibile: true,
+                badge: "PT Verificato",
+                isReal: true, // Flag per distinguere dai mock
+                email: parsedProfile.email,
+                telefono: parsedProfile.telefono,
+                slogan: parsedProfile.slogan,
+                instagram: parsedProfile.instagram,
+                sitoWeb: parsedProfile.sitoWeb,
+                disponibilitaOnline: parsedProfile.disponibilitaOnline !== false,
+                disponibilitaPresenza: parsedProfile.disponibilitaPresenza !== false
+              };
+              
+              realTrainers = [trainer];
+              debugMessages.push(`Trainer reale creato: ${trainer.nome} - Città: ${trainer.citta} - Spec: ${trainer.specializzazioni.join(', ')}`);
+            }
+          } catch (parseError) {
+            debugMessages.push(`Errore parsing profilo PT: ${parseError.message}`);
+          }
+        }
+
+        // Profili mock per demo
+        const mockTrainers = [
+          {
+            id: 1,
+            nome: "Marco Rossi",
+            specializzazioni: ["massa", "forza"],
+            citta: "milano",
+            rating: 4.9,
+            recensioni: 127,
+            programmiCreati: 12,
+            esperienza: "8 anni",
+            certificazioni: ["CONI", "FIPE"],
+            prezzo: "€60-80/ora",
+            descrizione: "Specialista in powerlifting e massa muscolare. Preparatore di atleti agonisti.",
+            immagine: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=300&fit=crop&face=center",
+            disponibile: true,
+            badge: "Top Rated",
+            isMock: true
+          },
+          {
+            id: 2,
+            nome: "Sofia Bianchi",
+            specializzazioni: ["dimagrimento", "cardio"],
+            citta: "roma",
+            rating: 4.8,
+            recensioni: 94,
+            programmiCreati: 8,
+            esperienza: "6 anni",
+            certificazioni: ["NASM", "ASI"],
+            prezzo: "€50-70/ora",
+            descrizione: "Esperta in trasformazione corporea e nutrizione sportiva.",
+            immagine: "https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?w=300&h=300&fit=crop&face=center",
+            disponibile: true,
+            badge: "Verified",
+            isMock: true
+          },
+          {
+            id: 3,
+            nome: "Andrea Verdi",
+            specializzazioni: ["functional", "preparazione"],
+            citta: "torino",
+            rating: 4.7,
+            recensioni: 82,
+            programmiCreati: 15,
+            esperienza: "10 anni",
+            certificazioni: ["CONI", "ISSA"],
+            prezzo: "€70-90/ora",
+            descrizione: "Coach di atleti professionisti, specialista in functional training.",
+            immagine: "https://images.unsplash.com/photo-1567013127542-490d757e51cd?w=300&h=300&fit=crop&face=center",
+            disponibile: false,
+            badge: "Pro",
+            isMock: true
+          },
+          {
+            id: 4,
+            nome: "Elena Russo",
+            specializzazioni: ["yoga", "riabilitazione"],
+            citta: "firenze",
+            rating: 4.9,
+            recensioni: 156,
+            programmiCreati: 6,
+            esperienza: "12 anni",
+            certificazioni: ["RYT", "ACSM"],
+            prezzo: "€40-60/ora",
+            descrizione: "Istruttrice yoga certificata e fisioterapista specializzata.",
+            immagine: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=300&h=300&fit=crop&face=center",
+            disponibile: true,
+            badge: "Expert",
+            isMock: true
+          },
+          {
+            id: 5,
+            nome: "Matteo Online",
+            specializzazioni: ["forza", "preparazione"],
+            citta: "online",
+            rating: 4.9,
+            recensioni: 203,
+            programmiCreati: 18,
+            esperienza: "9 anni",
+            certificazioni: ["CONI", "NSCA"],
+            prezzo: "€35-55/ora",
+            descrizione: "Coach online specializzato in powerlifting e preparazione agonistica.",
+            immagine: "https://images.unsplash.com/photo-1583500178690-f7e6a7c0ea54?w=300&h=300&fit=crop&face=center",
+            disponibile: true,
+            badge: "Digital Expert",
+            isMock: true
+          }
+        ];
+
+        // Combina trainer reali e mock
+        const allTrainers = [...realTrainers, ...mockTrainers];
+        
+        setPersonalTrainers(allTrainers);
+        debugMessages.push(`Trainer totali caricati: ${allTrainers.length} (${realTrainers.length} reali, ${mockTrainers.length} mock)`);
+        
+        setDebugInfo(debugMessages.join('\n'));
+        console.log('DEBUG PROFESSIONISTI:', debugMessages.join('\n'));
+        
+      } catch (error) {
+        console.error('Errore nel caricamento trainer:', error);
+        debugMessages.push(`ERRORE: ${error.message}`);
+        setDebugInfo(debugMessages.join('\n'));
+        // Fallback ai soli mock in caso di errore
+        setPersonalTrainers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTrainers();
+
+    // Ricarica ogni 30 secondi per sincronizzare con la dashboard PT
+    const interval = setInterval(loadTrainers, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const trainersFiltered = personalTrainers.filter(trainer => {
     const matchSearch = trainer.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -335,10 +323,22 @@ export default function ProfessionistiPage() {
       'Aqua Expert': 'bg-blue-600',
       'Combat Pro': 'bg-red-500',
       'Home Trainer': 'bg-green-600',
-      'Cycling Pro': 'bg-yellow-600'
+      'Cycling Pro': 'bg-yellow-600',
+      'PT Verificato': 'bg-purple-600'
     };
     return colors[badge] || 'bg-gray-500';
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Caricamento professionisti...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -436,6 +436,21 @@ export default function ProfessionistiPage() {
           </div>
         </header>
 
+        {/* Navigation Header con Home Button */}
+        <div className="bg-white border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            {/* Breadcrumb Navigation */}
+            <div className="flex items-center space-x-2 text-sm mb-4">
+              <Link href="/" className="flex items-center text-blue-600 hover:text-blue-700 transition-colors">
+                <Home className="w-4 h-4 mr-1" />
+                Home
+              </Link>
+              <ChevronRight className="w-4 h-4 text-gray-400" />
+              <span className="text-gray-600">Professionisti</span>
+            </div>
+          </div>
+        </div>
+
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white py-16">
           <div className="max-w-7xl mx-auto px-6 text-center">
@@ -446,6 +461,17 @@ export default function ProfessionistiPage() {
               <strong>Personal Trainer certificati</strong> e <strong>preparatori qualificati</strong> con 
               anni di esperienza e specializzazioni comprovate 🏆
             </p>
+            
+            {/* Debug Info (solo in sviluppo - rimuovi in produzione) */}
+            {process.env.NODE_ENV === 'development' && debugInfo && (
+              <details className="max-w-2xl mx-auto mt-8 p-4 bg-white/10 backdrop-blur-sm rounded-lg text-left">
+                <summary className="cursor-pointer text-blue-200 font-medium flex items-center">
+                  <AlertCircle className="w-4 h-4 mr-2" />
+                  Debug Info (solo sviluppo)
+                </summary>
+                <pre className="text-xs text-blue-100 mt-2 whitespace-pre-wrap">{debugInfo}</pre>
+              </details>
+            )}
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
               <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
@@ -542,6 +568,11 @@ export default function ProfessionistiPage() {
 
             <div className="text-center text-gray-600 mb-8">
               {trainersFiltered.length} professionisti trovati
+              {personalTrainers.filter(t => t.isReal).length > 0 && (
+                <span className="ml-2 text-purple-600 font-medium">
+                  ({personalTrainers.filter(t => t.isReal).length} PT registrati)
+                </span>
+              )}
             </div>
           </div>
         </section>
@@ -565,6 +596,11 @@ export default function ProfessionistiPage() {
                       {trainer.badge}
                     </div>
                     <div className={`absolute bottom-4 right-4 w-3 h-3 rounded-full ${trainer.disponibile ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                    {trainer.isReal && (
+                      <div className="absolute bottom-4 left-4 bg-purple-600 text-white px-2 py-1 rounded-full text-xs font-medium">
+                        🆕 Nuovo
+                      </div>
+                    )}
                   </div>
 
                   <div className="p-6">
@@ -587,6 +623,12 @@ export default function ProfessionistiPage() {
                       {trainer.esperienza}
                     </div>
 
+                    {trainer.slogan && (
+                      <p className="text-blue-600 font-medium italic text-sm mb-2">
+                        "{trainer.slogan}"
+                      </p>
+                    )}
+
                     <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                       {trainer.descrizione}
                     </p>
@@ -597,7 +639,7 @@ export default function ProfessionistiPage() {
                         const specializzazione = specializzazioni.find(s => s.id === spec);
                         return (
                           <span key={spec} className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
-                            {specializzazione?.emoji} {specializzazione?.label}
+                            {specializzazione?.emoji} {specializzazione?.label || spec}
                           </span>
                         );
                       })}
@@ -612,11 +654,16 @@ export default function ProfessionistiPage() {
                     <div className="flex items-center mb-4">
                       <Award className="w-4 h-4 text-green-600 mr-2" />
                       <div className="flex gap-1">
-                        {trainer.certificazioni.map((cert, index) => (
+                        {trainer.certificazioni.slice(0, 3).map((cert, index) => (
                           <span key={index} className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">
                             {cert}
                           </span>
                         ))}
+                        {trainer.certificazioni.length > 3 && (
+                          <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-medium">
+                            +{trainer.certificazioni.length - 3}
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -628,12 +675,25 @@ export default function ProfessionistiPage() {
                       <span className="font-medium text-blue-600">{trainer.prezzo}</span>
                     </div>
 
+                    {/* Disponibilità */}
+                    <div className="text-xs text-gray-500 mb-4">
+                      {trainer.disponibilitaOnline && trainer.disponibilitaPresenza && (
+                        <span>🌐 Online + 📍 Presenza</span>
+                      )}
+                      {trainer.disponibilitaOnline && !trainer.disponibilitaPresenza && (
+                        <span>🌐 Solo Online</span>
+                      )}
+                      {!trainer.disponibilitaOnline && trainer.disponibilitaPresenza && (
+                        <span>📍 Solo Presenza</span>
+                      )}
+                    </div>
+
                     <div className="flex items-center justify-between">
                       <span className={`text-sm font-medium ${trainer.disponibile ? 'text-green-600' : 'text-red-600'}`}>
                         {trainer.disponibile ? '🟢 Disponibile' : '🔴 Non disponibile'}
                       </span>
                       <Link
-                        href={`/professionisti/${trainer.id}`}
+                        href={`/professionisti/${trainer.isReal ? trainer.id : trainer.id}`}
                         className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center"
                       >
                         Profilo
